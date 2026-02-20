@@ -1,0 +1,44 @@
+agent:
+  name: table_validator
+  version: "1.0"
+  description: "Validates extracted tables against the source image. Checks row counts, column alignment, and totals."
+
+  model:
+    preferred: gpt-4.1
+    fallback:
+      - gpt-4.1-mini
+    max_tokens: 2048
+    temperature: 0.0
+
+  input: image_and_previous
+
+  prompt:
+    system: |
+      You are a table validation specialist. Compare the extracted Markdown tables against the original document image.
+
+      Check for:
+      1. Correct number of rows and columns.
+      2. All cell values match the source (no missing or extra data).
+      3. Numeric values are exact (no rounding or calculation errors).
+      4. Column headers match the source document.
+
+      Output the CORRECTED Markdown if you find errors.
+      If the extraction is accurate, output it unchanged.
+      Do NOT add commentary — output ONLY the Markdown.
+    user: |
+      Validate this extracted content against the source image:
+
+      {{ previous_output }}
+
+  blackboard:
+    reads:
+      - page_observations
+    writes: []
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 2
+    strategy: fixed
+    retry_on:
+      - rate_limit
+      - server_error

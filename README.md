@@ -1,6 +1,6 @@
 # doc2md
 
-[![CI](https://github.com/rgeorge12/doc2md/actions/workflows/ci.yml/badge.svg)](https://github.com/rgeorge12/doc2md/actions/workflows/ci.yml)
+[![CI](https://github.com/reubingeorge/doc2md/actions/workflows/ci.yml/badge.svg)](https://github.com/reubingeorge/doc2md/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -219,7 +219,7 @@ pipeline:
 ## Development
 
 ```bash
-git clone https://github.com/rgeorge12/doc2md.git
+git clone https://github.com/reubingeorge/doc2md.git
 cd doc2md
 pip install -e ".[dev]"
 pytest tests/ -v

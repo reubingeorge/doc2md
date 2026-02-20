@@ -1,0 +1,56 @@
+agent:
+  name: invoice_extract
+  version: "1.0"
+  description: "Extracts structured data from invoices — line items, totals, dates, vendor info."
+
+  model:
+    preferred: gpt-4.1-mini
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 4096
+    temperature: 0.0
+
+  input: image
+
+  preprocessing:
+    - name: enhance_contrast
+      params: { factor: 1.3 }
+    - name: sharpen
+
+  prompt:
+    system: |
+      You are an invoice data extraction specialist. Convert the invoice image to structured Markdown.
+
+      Rules:
+      - Extract vendor name, address, and contact info as a header section.
+      - Extract invoice number, date, due date, and PO number into a metadata table.
+      - Extract all line items into a Markdown table with columns: Item, Description, Qty, Unit Price, Amount.
+      - Extract subtotal, tax, discounts, and total into a summary section.
+      - Preserve the exact numbers — do NOT calculate or correct any values.
+      - If a field is not present, omit it. Do NOT guess.
+      - Output ONLY the Markdown content.
+      {% if bb is defined and bb.document_metadata is defined %}
+      {% if bb.document_metadata.language %}
+      Document language: {{ bb.document_metadata.language }}.
+      {% endif %}
+      {% endif %}
+    user: "Extract all invoice data from this image as structured Markdown."
+
+  postprocessing:
+    - fix_table_alignment
+    - strip_artifacts
+
+  blackboard:
+    reads:
+      - document_metadata.language
+    writes:
+      - page_observations.{page_num}.table_count
+    writes_via: code_computed
+
+  retry:
+    max_attempts: 3
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error
+      - timeout

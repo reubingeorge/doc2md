@@ -1,0 +1,26 @@
+pipeline:
+  name: invoice
+  version: "1.0"
+  description: "Invoice processing — extract structured data, validate tables, clean up."
+
+  steps:
+    # Step 1: Extract invoice content from image
+    - name: extract
+      agent: invoice_extract
+      input: image
+
+    # Step 2: Validate tables against source image
+    - name: validate_tables
+      agent: table_validator
+      input: image_and_previous
+      depends_on: [extract]
+
+    # Step 3: Clean up the final markdown
+    - name: cleanup
+      type: code
+      function: fix_table_alignment
+      depends_on: [validate_tables]
+
+  postprocessing:
+    - normalize_headings
+    - strip_artifacts

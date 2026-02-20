@@ -1,0 +1,36 @@
+pipeline:
+  name: invoice_parallel
+  version: "1.0"
+  description: "Invoice processing with parallel extraction — metadata and line items run simultaneously."
+
+  steps:
+    # Step 1: Extract metadata and line items in parallel
+    - name: extraction
+      type: parallel
+      depends_on: []
+      steps:
+        - name: metadata
+          agent: metadata_extract
+          input: image
+          pages: [1]
+
+        - name: line_items
+          agent: invoice_extract
+          input: image
+
+    # Step 2: Merge parallel outputs
+    - name: merge
+      agent: document_merger
+      input: previous_output_only
+      depends_on: [extraction]
+
+    # Step 3: Validate against source
+    - name: validate
+      agent: table_validator
+      input: image_and_previous
+      depends_on: [merge]
+
+  postprocessing:
+    - fix_table_alignment
+    - normalize_headings
+    - strip_artifacts
