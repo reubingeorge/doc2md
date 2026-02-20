@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING
 
 from doc2md.blackboard.board import Blackboard
 from doc2md.config.schema import PageSelector, RouterConfig, RouterStrategy, StepConfig
 from doc2md.pipeline.data_flow import StepInput
+from doc2md.pipeline.step_executor import _MAX_PAGE_CONCURRENCY
 from doc2md.types import AgentConfig, StepResult, TokenUsage
 
 if TYPE_CHECKING:
@@ -41,29 +43,32 @@ async def execute_page_route(
     if step_config.cross_page_aware:
         assignments = _apply_cross_page_grouping(assignments, blackboard)
 
-    # Execute each page with its assigned agent
-    page_results: list[StepResult] = []
-    for page_num, agent_name in sorted(assignments.items()):
+    # Execute pages concurrently (bounded by semaphore)
+    semaphore = asyncio.Semaphore(_MAX_PAGE_CONCURRENCY)
+    sorted_assignments = sorted(assignments.items())
+
+    async def _process_page(page_num: int, agent_name: str) -> StepResult | None:
         if agent_name not in agent_configs:
             agent_name = router.default_agent
         if agent_name not in agent_configs:
             raise ValueError(f"Agent '{agent_name}' not found for page {page_num}")
-
         img_idx = page_num - 1
         if img_idx >= len(images):
-            continue
+            return None
+        async with semaphore:
+            return await agent_engine.execute(
+                agent_config=agent_configs[agent_name],
+                image_bytes=images[img_idx],
+                previous_output=step_input.previous_output,
+                blackboard=blackboard,
+                step_name=f"{step_config.name}_page_{page_num}",
+                page_num=page_num,
+                cache_manager=cache_manager,
+                pipeline_name=pipeline_name,
+            )
 
-        result = await agent_engine.execute(
-            agent_config=agent_configs[agent_name],
-            image_bytes=images[img_idx],
-            previous_output=step_input.previous_output,
-            blackboard=blackboard,
-            step_name=f"{step_config.name}_page_{page_num}",
-            page_num=page_num,
-            cache_manager=cache_manager,
-            pipeline_name=pipeline_name,
-        )
-        page_results.append(result)
+    results = await asyncio.gather(*[_process_page(pn, an) for pn, an in sorted_assignments])
+    page_results = [r for r in results if r is not None]
 
     merged = _merge_routed_results(step_config.name, page_results, assignments)
     blackboard.write("step_outputs", step_config.name, merged.markdown, writer=step_config.name)

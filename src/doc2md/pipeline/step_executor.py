@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
@@ -13,6 +14,9 @@ from doc2md.types import AgentConfig, StepResult, TokenUsage
 if TYPE_CHECKING:
     from doc2md.agents.engine import AgentEngine
     from doc2md.cache.manager import CacheManager
+
+# Max concurrent VLM calls per step (pages processed in parallel)
+_MAX_PAGE_CONCURRENCY = 4
 
 # Registry of code step functions
 _CODE_STEP_REGISTRY: dict[str, Callable[..., str]] = {}
@@ -112,20 +116,25 @@ async def _execute_agent_step(
         blackboard.write("step_outputs", step_config.name, result.markdown, writer=step_config.name)
         return result
 
-    # Process pages
-    page_results: list[StepResult] = []
-    for i, img in enumerate(images):
-        result = await agent_engine.execute(
-            agent_config=agent_config,
-            image_bytes=img,
-            previous_output=step_input.previous_output,
-            blackboard=blackboard,
-            step_name=step_config.name,
-            page_num=i + 1,
-            cache_manager=cache_manager,
-            pipeline_name=pipeline_name,
-        )
-        page_results.append(result)
+    # Process pages concurrently (bounded by semaphore)
+    semaphore = asyncio.Semaphore(_MAX_PAGE_CONCURRENCY)
+
+    async def _process_page(i: int, img: bytes) -> StepResult:
+        async with semaphore:
+            return await agent_engine.execute(
+                agent_config=agent_config,
+                image_bytes=img,
+                previous_output=step_input.previous_output,
+                blackboard=blackboard,
+                step_name=step_config.name,
+                page_num=i + 1,
+                cache_manager=cache_manager,
+                pipeline_name=pipeline_name,
+            )
+
+    page_results = list(
+        await asyncio.gather(*[_process_page(i, img) for i, img in enumerate(images)])
+    )
 
     merged = _merge_page_results(step_config.name, agent_name, page_results)
     blackboard.write("step_outputs", step_config.name, merged.markdown, writer=step_config.name)

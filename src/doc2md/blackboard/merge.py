@@ -90,7 +90,10 @@ def _merge_agent_notes(target: Blackboard, source: Blackboard) -> None:
     for agent, notes in source.agent_notes.items():
         if agent not in target.agent_notes:
             target.agent_notes[agent] = {}
-        target.agent_notes[agent].update(notes)
+        if isinstance(notes, dict) and isinstance(target.agent_notes[agent], dict):
+            target.agent_notes[agent].update(notes)
+        else:
+            target.agent_notes[agent] = notes
 
 
 def _merge_confidence_signals(target: Blackboard, source: Blackboard) -> None:
