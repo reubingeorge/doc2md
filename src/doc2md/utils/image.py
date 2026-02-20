@@ -25,15 +25,19 @@ def image_to_base64(image_bytes: bytes) -> str:
 
 def pdf_to_images(path: str | Path, dpi: int = 200) -> list[bytes]:
     """Convert a PDF file to a list of PNG image byte arrays (one per page)."""
-    from pdf2image import convert_from_path
+    import pymupdf
 
     path = Path(path)
     _validate_path(path)
 
-    pil_images = convert_from_path(str(path), dpi=dpi)
+    doc = pymupdf.open(str(path))
     result: list[bytes] = []
-    for img in pil_images:
-        result.append(_pil_to_png_bytes(img))
+    zoom = dpi / 72  # PyMuPDF default is 72 DPI
+    matrix = pymupdf.Matrix(zoom, zoom)
+    for page in doc:
+        pix = page.get_pixmap(matrix=matrix)
+        result.append(pix.tobytes("png"))
+    doc.close()
     return result
 
 
