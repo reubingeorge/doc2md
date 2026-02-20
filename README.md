@@ -229,6 +229,3 @@ pytest tests/ -v
 
 MIT License — see [LICENSE](LICENSE) for details.
 
-## Author
-
-**Reubin George** — [george.reubin@gmail.com](mailto:george.reubin@gmail.com)
