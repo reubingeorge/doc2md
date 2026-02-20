@@ -22,6 +22,7 @@ agent:
       - Preserve any critical numbers, dates, or names
       - Use Markdown formatting
       - Keep the summary under 200 words
+      - Output ONLY the summary, no additional commentary
       {% if bb.document_metadata.language %}
       Write the summary in {{ bb.document_metadata.language }}.
       {% endif %}

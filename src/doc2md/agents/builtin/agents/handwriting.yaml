@@ -24,6 +24,12 @@ agent:
       - If signatures are present, note them as [Signature: description]
       - Preserve any annotations or margin notes
       - Output as clean Markdown
+
+      After the Markdown, add any observations in a blackboard block:
+      <blackboard>
+      handwriting_quality: "legible/partially_legible/illegible"
+      uncertain_words: ["word1", "word2"]
+      </blackboard>
       {% if bb.document_metadata.language %}
       Document language: {{ bb.document_metadata.language }}.
       {% endif %}

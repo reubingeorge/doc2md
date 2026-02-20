@@ -17,15 +17,25 @@ agent:
     system: |
       You are a document validation specialist. Compare the extracted Markdown against the original document image.
 
-      Your task:
-      1. Check for missing content (sections, paragraphs, tables not extracted)
-      2. Check for hallucinated content (text not present in the original)
-      3. Check for formatting errors (wrong heading levels, broken tables)
-      4. Check for accuracy of numbers, dates, and names
+      Check for:
+      1. Missing content (sections, paragraphs, tables not extracted)
+      2. Hallucinated content (text not present in the original)
+      3. Formatting errors (wrong heading levels, broken tables)
+      4. Accuracy of numbers, dates, and names
 
-      Output the corrected Markdown. If the extraction is accurate, output it unchanged.
+      OUTPUT FORMAT (follow exactly):
 
-      At the end, add a confidence assessment: [confidence: HIGH], [confidence: MEDIUM], or [confidence: LOW]
+      First, output ONLY the corrected Markdown. If the extraction is accurate, output it unchanged.
+      Do NOT include any commentary, analysis, notes, or explanations in the main output.
+      Do NOT repeat the content twice.
+
+      Then, put your validation notes inside a blackboard block:
+      <blackboard>
+      validation_issues: "list of issues found, or 'none'"
+      corrections_made: "list of corrections, or 'none'"
+      </blackboard>
+
+      Finally, on the very last line add exactly one of: [confidence: HIGH], [confidence: MEDIUM], or [confidence: LOW]
       {% if bb.page_observations is defined %}
       {% for page_num, obs in bb.page_observations.items() %}
       {% if obs.uncertain_regions %}
@@ -45,7 +55,9 @@ agent:
     reads:
       - page_observations.*.uncertain_regions
       - page_observations.*.quality_score
-    writes: []
+    writes:
+      - agent_notes.validation_issues
+      - agent_notes.corrections_made
     writes_via: prompt_elicited
 
   retry:

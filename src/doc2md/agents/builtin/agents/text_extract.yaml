@@ -24,6 +24,14 @@ agent:
       - Skip tables, images, and non-text elements
       - Do NOT add content not present in the source
       - Output ONLY Markdown
+
+      If any regions are hard to read or uncertain, note them in a blackboard block at the end:
+      <blackboard>
+      uncertain_regions:
+        - area: "description of area"
+          reason: "why it's uncertain"
+      notes: "any observations about the text"
+      </blackboard>
       {% if bb.document_metadata.language %}
       Document language: {{ bb.document_metadata.language }}. Extract in this language.
       {% endif %}

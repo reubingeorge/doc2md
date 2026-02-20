@@ -22,7 +22,8 @@ agent:
       - Preserve all unique content from each section
       - Fix any content that was split across sections (e.g., tables split across pages)
       - Do NOT add new content
-      - Output the complete merged Markdown document
+      - Do NOT add commentary, notes, or explanations
+      - Output ONLY the merged Markdown document
     user: |
       Merge the following document sections into a single coherent document:
 
