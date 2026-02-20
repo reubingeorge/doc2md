@@ -20,6 +20,22 @@ from doc2md.vlm.client import AsyncVLMClient
 logger = logging.getLogger(__name__)
 
 
+def _run_async(coro):
+    """Run a coroutine, handling both standalone and nested event loops (e.g. Jupyter)."""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        import nest_asyncio
+
+        nest_asyncio.apply()
+        return asyncio.run(coro)
+    else:
+        return asyncio.run(coro)
+
+
 class Doc2Md:
     """Main converter class with full lifecycle control."""
 
@@ -248,11 +264,11 @@ def convert(
     """Convert a document to markdown (sync wrapper)."""
     converter = Doc2Md(api_key=api_key, no_cache=no_cache)
     try:
-        return asyncio.run(
+        return _run_async(
             converter.convert_async(input_path, agent=agent, pipeline=pipeline, model=model)
         )
     finally:
-        asyncio.run(converter.close())
+        _run_async(converter.close())
 
 
 def convert_batch(
@@ -281,6 +297,6 @@ def convert_batch(
         return results
 
     try:
-        return asyncio.run(_run())
+        return _run_async(_run())
     finally:
-        asyncio.run(converter.close())
+        _run_async(converter.close())
