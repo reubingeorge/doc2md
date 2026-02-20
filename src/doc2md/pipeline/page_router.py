@@ -125,7 +125,8 @@ def _merge_routed_results(
     if not results:
         return StepResult(step_name=step_name, agent_name="page_route", markdown="")
 
-    combined_md = "\n\n".join(r.markdown for r in results)
+    page_markdowns = [r.markdown for r in results]
+    combined_md = "\n\n".join(page_markdowns)
     total_usage = TokenUsage(
         prompt_tokens=sum(r.token_usage.prompt_tokens for r in results),
         completion_tokens=sum(r.token_usage.completion_tokens for r in results),
@@ -136,6 +137,7 @@ def _merge_routed_results(
         step_name=step_name,
         agent_name="page_route",
         markdown=combined_md,
+        page_markdowns=page_markdowns,
         token_usage=total_usage,
         model_used=results[0].model_used if results else "",
     )

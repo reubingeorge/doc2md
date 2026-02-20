@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -134,6 +135,7 @@ class StepResult(BaseModel):
     step_name: str
     agent_name: str
     markdown: str
+    page_markdowns: list[str] = Field(default_factory=list)
     token_usage: TokenUsage = Field(default_factory=TokenUsage)
     confidence: float | None = None
     confidence_level: ConfidenceLevel | None = None
@@ -150,6 +152,7 @@ class PageTask(BaseModel):
 
 class ConversionResult(BaseModel):
     markdown: str
+    page_markdowns: list[str] = Field(default_factory=list)
     classified_as: str | None = None
     steps: dict[str, StepResult] = Field(default_factory=dict)
     confidence: float | None = None
@@ -159,3 +162,35 @@ class ConversionResult(BaseModel):
     pages_processed: int = 0
     pages_failed: list[int] = Field(default_factory=list)
     model_config = {"arbitrary_types_allowed": True}
+
+    def save(
+        self,
+        path: str | Path,
+        per_page: bool = False,
+    ) -> list[Path]:
+        """Save markdown output to file(s).
+
+        Args:
+            path: Output file path (single file) or directory (per-page).
+            per_page: If True, save each page as a separate file.
+
+        Returns:
+            List of paths written.
+        """
+        path = Path(path)
+        written: list[Path] = []
+
+        if per_page and self.page_markdowns:
+            # Save per-page files into a directory
+            path.mkdir(parents=True, exist_ok=True)
+            for i, page_md in enumerate(self.page_markdowns, 1):
+                page_path = path / f"page_{i:03d}.md"
+                page_path.write_text(page_md, encoding="utf-8")
+                written.append(page_path)
+        else:
+            # Save as a single file
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(self.markdown, encoding="utf-8")
+            written.append(path)
+
+        return written

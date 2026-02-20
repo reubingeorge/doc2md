@@ -38,12 +38,14 @@ class PipelineResult:
         blackboard: Blackboard,
         pipeline_name: str,
         confidence_report: ConfidenceReport | None = None,
+        page_markdowns: list[str] | None = None,
     ) -> None:
         self.markdown = markdown
         self.steps = steps
         self.blackboard = blackboard
         self.pipeline_name = pipeline_name
         self.confidence_report = confidence_report
+        self.page_markdowns = page_markdowns or []
 
     @property
     def token_usage(self) -> TokenUsage:
@@ -161,6 +163,7 @@ class PipelineEngine:
 
         # Final merge
         final_markdown = self._final_merge(step_results, pipeline_config)
+        page_markdowns = self._collect_page_markdowns(step_results, pipeline_config)
 
         # Pipeline-level postprocessing
         if pipeline_config.postprocessing:
@@ -172,6 +175,7 @@ class PipelineEngine:
             blackboard=blackboard,
             pipeline_name=pipeline_config.name,
             confidence_report=confidence_report,
+            page_markdowns=page_markdowns,
         )
 
     @staticmethod
@@ -241,3 +245,21 @@ class PipelineEngine:
             return merge_outputs(terminal_outputs, pipeline_config.page_merge)
 
         return merge_outputs(outputs, pipeline_config.page_merge)
+
+    @staticmethod
+    def _collect_page_markdowns(
+        step_results: dict[str, StepResult],
+        pipeline_config: PipelineConfig,
+    ) -> list[str]:
+        """Extract per-page markdowns from the terminal step."""
+        all_deps: set[str] = set()
+        for step in pipeline_config.steps:
+            all_deps.update(step.depends_on or [])
+        terminal_steps = [s.name for s in pipeline_config.steps if s.name not in all_deps]
+
+        # Use the first terminal step that has page_markdowns
+        for name in terminal_steps:
+            result = step_results.get(name)
+            if result and result.page_markdowns:
+                return result.page_markdowns
+        return []

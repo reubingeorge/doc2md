@@ -48,6 +48,7 @@ def cli() -> None:
 @click.option("--model", type=str, default=None, help="Override model for all agents.")
 @click.option("--workers", type=int, default=None, help="Concurrent workers for batch.")
 @click.option("--no-cache", is_flag=True, default=False, help="Disable caching.")
+@click.option("--per-page", is_flag=True, default=False, help="Save each page as a separate file.")
 @click.option("-v", "--verbose", count=True, help="Increase verbosity (-v info, -vv debug).")
 def convert(
     input_path: str,
@@ -58,6 +59,7 @@ def convert(
     model: str | None,
     workers: int | None,
     no_cache: bool,
+    per_page: bool,
     verbose: int,
 ) -> None:
     """Convert document(s) to markdown."""
@@ -74,7 +76,9 @@ def convert(
     if input_path_obj.is_dir():
         _convert_batch(input_path_obj, output_dir, pipeline, agent, model, config, no_cache)
     else:
-        _convert_single(input_path_obj, output, pipeline, agent, model, config, no_cache, verbose)
+        _convert_single(
+            input_path_obj, output, pipeline, agent, model, config, no_cache, per_page, verbose
+        )
 
 
 def _convert_single(
@@ -85,6 +89,7 @@ def _convert_single(
     model: str | None,
     config: dict,
     no_cache: bool,
+    per_page: bool,
     verbose: int,
 ) -> None:
     """Convert a single file."""
@@ -114,8 +119,9 @@ def _convert_single(
 
     # Output
     if output:
-        Path(output).write_text(result.markdown)
-        console.print(f"[green]Written to {output}[/green]")
+        written = result.save(output, per_page=per_page)
+        for p in written:
+            console.print(f"[green]Written to {p}[/green]")
     else:
         console.print(result.markdown)
 

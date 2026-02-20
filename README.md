@@ -23,7 +23,7 @@ Agentic document-to-markdown converter using composable VLM agents orchestrated 
 ## Features
 
 - **Multi-agent pipelines** — Chain specialized VLM agents (text extraction, table parsing, handwriting recognition) via YAML-defined DAGs
-- **Dynamic model discovery** — Automatically detects available models from the OpenAI API at runtime; no hardcoded model list
+- **Flexible output** — Save as a single merged markdown file or per-page files for granular control
 - **Auto-classification** — Detects document type and selects the optimal pipeline automatically
 - **Blackboard architecture** — Typed, region-based shared memory enables inter-agent communication
 - **Confidence scoring** — 6-signal confidence engine with adaptive weight redistribution and calibration
@@ -84,6 +84,22 @@ result = doc2md.convert("contract.pdf", pipeline="legal_contract")
 # Use a specific model
 result = doc2md.convert("notes.png", model="gpt-4o")
 
+# Save to file
+result = doc2md.convert("report.pdf", output="report.md")
+
+# Save per-page (creates page_001.md, page_002.md, ... in output dir)
+result = doc2md.convert("report.pdf", output="output/", per_page=True)
+
+# Access per-page results programmatically
+result = doc2md.convert("report.pdf")
+for i, page_md in enumerate(result.page_markdowns, 1):
+    print(f"--- Page {i} ---")
+    print(page_md)
+
+# Or save via the result object
+result.save("report.md")                  # Single file
+result.save("output/", per_page=True)     # Per-page files
+
 # Batch convert
 results = doc2md.convert_batch(["a.pdf", "b.png"], max_workers=5)
 
@@ -98,6 +114,9 @@ await converter.close()
 ```bash
 # Single file
 doc2md convert document.pdf -o output.md
+
+# Per-page output (saves page_001.md, page_002.md, ... in output dir)
+doc2md convert document.pdf -o output/ --per-page
 
 # Explicit pipeline
 doc2md convert document.pdf --pipeline receipt
@@ -132,7 +151,7 @@ doc2md validate-pipeline my_pipeline.yaml # Validate a YAML config
 | `generic` | Default fallback — single-step extraction |
 | `receipt` | Receipts and invoices |
 | `structured_pdf` | Forms with parallel metadata / text / table extraction |
-| `academic` | Research papers with summarization |
+| `academic` | Research papers with validation |
 | `legal_contract` | Contracts with page-level routing |
 | `handwritten` | Handwritten notes |
 | `mixed_document` | Unknown documents with page-type routing |

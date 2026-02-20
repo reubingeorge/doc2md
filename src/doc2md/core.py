@@ -129,6 +129,7 @@ class Doc2Md:
         )
         return ConversionResult(
             markdown=result.markdown,
+            page_markdowns=result.page_markdowns,
             classified_as=result.pipeline_name,
             steps=result.steps,
             token_usage=result.token_usage,
@@ -271,13 +272,24 @@ def convert(
     model: str | None = None,
     api_key: str | None = None,
     no_cache: bool = False,
+    output: str | Path | None = None,
+    per_page: bool = False,
 ) -> ConversionResult:
-    """Convert a document to markdown (sync wrapper)."""
+    """Convert a document to markdown (sync wrapper).
+
+    Args:
+        output: If provided, save markdown to this path.
+        per_page: If True with output, save each page as a separate file
+                  in the output directory (e.g., page_001.md, page_002.md).
+    """
     converter = Doc2Md(api_key=api_key, no_cache=no_cache)
     try:
-        return _run_async(
+        result = _run_async(
             converter.convert_async(input_path, agent=agent, pipeline=pipeline, model=model)
         )
+        if output:
+            result.save(output, per_page=per_page)
+        return result
     finally:
         _run_async(converter.close())
 

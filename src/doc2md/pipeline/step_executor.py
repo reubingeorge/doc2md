@@ -170,10 +170,13 @@ def _merge_page_results(
     results: list[StepResult],
 ) -> StepResult:
     """Merge per-page results into a single step result."""
+    page_markdowns = [r.markdown for r in results]
+
     if len(results) == 1:
+        results[0].page_markdowns = page_markdowns
         return results[0]
 
-    combined_md = "\n\n".join(r.markdown for r in results)
+    combined_md = "\n\n".join(page_markdowns)
     total_usage = TokenUsage(
         prompt_tokens=sum(r.token_usage.prompt_tokens for r in results),
         completion_tokens=sum(r.token_usage.completion_tokens for r in results),
@@ -184,6 +187,7 @@ def _merge_page_results(
         step_name=step_name,
         agent_name=agent_name,
         markdown=combined_md,
+        page_markdowns=page_markdowns,
         token_usage=total_usage,
         model_used=results[0].model_used if results else "",
     )
