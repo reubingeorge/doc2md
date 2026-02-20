@@ -213,7 +213,12 @@ class PipelineEngine:
         step_results: dict[str, StepResult],
         pipeline_config: PipelineConfig,
     ) -> str:
-        """Merge all step outputs into the final document."""
+        """Merge step outputs into the final document.
+
+        For linear pipelines (A → B → C), use the terminal step's output
+        since each step refines the previous. For parallel/independent steps,
+        concatenate their outputs.
+        """
         outputs = {name: r.markdown for name, r in step_results.items() if r.markdown}
         if not outputs:
             return ""
@@ -221,5 +226,18 @@ class PipelineEngine:
         # If only one step, return its output directly
         if len(outputs) == 1:
             return next(iter(outputs.values()))
+
+        # Find terminal steps (steps that no other step depends on)
+        all_deps: set[str] = set()
+        for step in pipeline_config.steps:
+            all_deps.update(step.depends_on or [])
+
+        terminal_steps = [s.name for s in pipeline_config.steps if s.name not in all_deps]
+        terminal_outputs = {name: outputs[name] for name in terminal_steps if name in outputs}
+
+        if terminal_outputs:
+            if len(terminal_outputs) == 1:
+                return next(iter(terminal_outputs.values()))
+            return merge_outputs(terminal_outputs, pipeline_config.page_merge)
 
         return merge_outputs(outputs, pipeline_config.page_merge)

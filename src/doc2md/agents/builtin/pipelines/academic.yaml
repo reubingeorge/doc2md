@@ -14,7 +14,7 @@ pipeline:
       input: image
       depends_on: [metadata]
 
-    - name: summary
-      agent: summarize
-      input: previous_output_only
+    - name: validate
+      agent: validator
+      input: image_and_previous
       depends_on: [text_extraction]
