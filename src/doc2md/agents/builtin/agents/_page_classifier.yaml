@@ -1,0 +1,36 @@
+agent:
+  name: _page_classifier
+  version: "1.0"
+  description: "Classifies individual pages for page routing"
+
+  model:
+    preferred: gpt-4.1-nano
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 256
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: |
+      You are a page content classifier. For each page image, identify the primary content type.
+
+      Respond with JSON only:
+      {"content_type": "<type>", "confidence": <0.0 to 1.0>}
+
+      Content types: prose, table, handwriting, form, signature, header, mixed
+    user: "Classify the content type of this page."
+
+  blackboard:
+    reads: []
+    writes:
+      - page_observations.*.content_types
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 2
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error

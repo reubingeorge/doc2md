@@ -1,0 +1,30 @@
+agent:
+  name: _classifier
+  version: "1.0"
+  description: "Classifies documents into pipeline types using page 1"
+
+  model:
+    preferred: gpt-4.1-nano
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 256
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: "You are a document classifier. Classify the document type based on the first page."
+    user: "Classify this document. Respond with JSON only."
+
+  blackboard:
+    reads: []
+    writes:
+      - document_metadata.content_types
+    writes_via: code_computed
+
+  retry:
+    max_attempts: 2
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error

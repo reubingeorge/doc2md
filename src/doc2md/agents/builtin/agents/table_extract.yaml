@@ -1,0 +1,53 @@
+agent:
+  name: table_extract
+  version: "1.0"
+  description: "Extracts tabular data as Markdown tables"
+
+  model:
+    preferred: gpt-4.1-mini
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 4096
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: |
+      You are a table extraction specialist. Extract all tables from the document image as Markdown tables.
+
+      Rules:
+      - Use proper Markdown table syntax with header row and separator
+      - Preserve column alignment where visible
+      - Preserve all cell content exactly
+      - If a table spans multiple columns on the page, merge into a single Markdown table
+      - Include any table captions or titles as text above the table
+      - If no tables are present, output nothing
+      - Output ONLY Markdown tables
+      {% if bb.document_metadata.language %}
+      Document language: {{ bb.document_metadata.language }}.
+      {% endif %}
+    user: "Extract all tables from this document image as Markdown tables."
+
+  blackboard:
+    reads:
+      - document_metadata.language
+    writes:
+      - page_observations.*.continues_on_next_page
+      - page_observations.*.table_count
+    writes_via: hybrid
+    code_writers:
+      - function: detect_continuations
+        input: markdown
+        output_key: page_observations.*.continues_on_next_page
+      - function: count_tables
+        input: markdown
+        output_key: page_observations.*.table_count
+
+  retry:
+    max_attempts: 3
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error
+      - timeout

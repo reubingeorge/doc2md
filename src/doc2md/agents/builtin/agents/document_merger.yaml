@@ -1,0 +1,41 @@
+agent:
+  name: document_merger
+  version: "1.0"
+  description: "Merges multi-page or multi-step extraction outputs into a coherent document"
+
+  model:
+    preferred: gpt-4.1-mini
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 8192
+    temperature: 0.0
+
+  input: previous_output_only
+
+  prompt:
+    system: |
+      You are a document assembly specialist. Given multiple extracted sections, merge them into a single coherent Markdown document.
+
+      Rules:
+      - Resolve duplicate content between sections
+      - Maintain a consistent heading hierarchy
+      - Preserve all unique content from each section
+      - Fix any content that was split across sections (e.g., tables split across pages)
+      - Do NOT add new content
+      - Output the complete merged Markdown document
+    user: |
+      Merge the following document sections into a single coherent document:
+
+      {{ previous_output }}
+
+  blackboard:
+    reads: []
+    writes: []
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 2
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error

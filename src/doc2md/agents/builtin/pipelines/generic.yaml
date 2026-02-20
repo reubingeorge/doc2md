@@ -1,0 +1,9 @@
+pipeline:
+  name: generic
+  version: "1.0"
+  description: "General-purpose document extraction — single step, works for most documents"
+
+  steps:
+    - name: extract
+      agent: generic
+      input: image

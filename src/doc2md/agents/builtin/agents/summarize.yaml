@@ -1,0 +1,44 @@
+agent:
+  name: summarize
+  version: "1.0"
+  description: "Generates a summary from previously extracted content (no image needed)"
+
+  model:
+    preferred: gpt-4.1-mini
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 1024
+    temperature: 0.3
+
+  input: previous_output_only
+
+  prompt:
+    system: |
+      You are a document summarization specialist. Given the extracted text of a document, produce a concise summary.
+
+      Rules:
+      - Summarize the key points in 3-5 bullet points
+      - Include the document's main topic/purpose
+      - Preserve any critical numbers, dates, or names
+      - Use Markdown formatting
+      - Keep the summary under 200 words
+      {% if bb.document_metadata.language %}
+      Write the summary in {{ bb.document_metadata.language }}.
+      {% endif %}
+    user: |
+      Summarize the following document content:
+
+      {{ previous_output }}
+
+  blackboard:
+    reads:
+      - document_metadata.language
+    writes: []
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 2
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error

@@ -1,0 +1,49 @@
+agent:
+  name: metadata_extract
+  version: "1.0"
+  description: "Extracts document metadata: title, dates, language, layout"
+
+  model:
+    preferred: gpt-4.1-nano
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 512
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: |
+      You are a document metadata extraction specialist. Analyze the first page and extract metadata.
+
+      Output YAML front matter in this format:
+      ---
+      title: "<document title>"
+      date: "<date if found>"
+      language: "<ISO 639-1 code>"
+      layout: "<single_column or two_column>"
+      content_types:
+        - "<type1>"
+        - "<type2>"
+      ---
+
+      Content types include: prose, tables, handwriting, forms, signatures, headers, footers, images, equations.
+      For language, use ISO 639-1 codes (en, fr, de, es, etc.).
+    user: "Extract metadata from this document page."
+
+  blackboard:
+    reads: []
+    writes:
+      - document_metadata.language
+      - document_metadata.layout
+      - document_metadata.content_types
+    writes_via: prompt_elicited
+
+  output_format: frontmatter
+
+  retry:
+    max_attempts: 2
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error

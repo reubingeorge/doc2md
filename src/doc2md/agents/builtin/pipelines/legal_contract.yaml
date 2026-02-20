@@ -1,0 +1,36 @@
+pipeline:
+  name: legal_contract
+  version: "1.0"
+  description: "Multi-section legal contracts with mixed content types"
+
+  steps:
+    - name: metadata
+      agent: metadata_extract
+      input: image
+      pages: [1]
+
+    - name: body_extraction
+      type: page_route
+      depends_on: [metadata]
+      cross_page_aware: true
+      router:
+        strategy: rules
+        rules:
+          - pages: [1]
+            agent: metadata_extract
+          - pages: [-1]
+            agent: handwriting
+        default_agent: text_extract
+
+    - name: enrichment
+      type: parallel
+      depends_on: [metadata, body_extraction]
+      steps:
+        - name: summary
+          agent: summarize
+          input: previous_output_only
+
+    - name: final_validate
+      agent: validator
+      input: image_and_previous
+      depends_on: [enrichment]

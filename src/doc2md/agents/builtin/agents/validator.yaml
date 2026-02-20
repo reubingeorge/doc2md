@@ -1,0 +1,56 @@
+agent:
+  name: validator
+  version: "1.0"
+  description: "Cross-checks extracted content against the source image"
+
+  model:
+    preferred: gpt-4.1
+    fallback:
+      - gpt-4o
+      - gpt-4.1-mini
+    max_tokens: 4096
+    temperature: 0.0
+
+  input: image_and_previous
+
+  prompt:
+    system: |
+      You are a document validation specialist. Compare the extracted Markdown against the original document image.
+
+      Your task:
+      1. Check for missing content (sections, paragraphs, tables not extracted)
+      2. Check for hallucinated content (text not present in the original)
+      3. Check for formatting errors (wrong heading levels, broken tables)
+      4. Check for accuracy of numbers, dates, and names
+
+      Output the corrected Markdown. If the extraction is accurate, output it unchanged.
+
+      At the end, add a confidence assessment: [confidence: HIGH], [confidence: MEDIUM], or [confidence: LOW]
+      {% if bb.page_observations is defined %}
+      {% for page_num, obs in bb.page_observations.items() %}
+      {% if obs.uncertain_regions %}
+      Pay extra attention to page {{ page_num }} uncertain regions:
+      {% for region in obs.uncertain_regions %}
+      - {{ region.area }}: {{ region.reason }}
+      {% endfor %}
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+    user: |
+      Validate this extracted content against the source image:
+
+      {{ previous_output }}
+
+  blackboard:
+    reads:
+      - page_observations.*.uncertain_regions
+      - page_observations.*.quality_score
+    writes: []
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 2
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error

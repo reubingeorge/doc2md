@@ -1,0 +1,128 @@
+# Vision-capable models for doc2md
+# Source: openai-models-vision-reference.md (Feb 2026)
+# Only models that accept image input are listed here.
+
+models:
+  # ── GPT-5.x Family (reasoning + vision, no logprobs) ──
+  gpt-5.2:
+    tier: premium
+    priority: 1
+    logprobs: false
+    max_tokens: 128000
+    description: "Current flagship. Best vision model. Reasoning."
+
+  gpt-5.2-pro:
+    tier: premium
+    priority: 0
+    logprobs: false
+    max_tokens: 128000
+    description: "Smarter, more precise version of 5.2."
+
+  gpt-5.1:
+    tier: premium
+    priority: 2
+    logprobs: false
+    max_tokens: 128000
+    description: "Previous flagship reasoning model."
+
+  gpt-5:
+    tier: premium
+    priority: 3
+    logprobs: false
+    max_tokens: 128000
+    description: "Previous flagship. Superseded by 5.1/5.2."
+
+  gpt-5-mini:
+    tier: standard
+    priority: 4
+    logprobs: false
+    max_tokens: 128000
+    description: "Fast, cost-efficient reasoning. $0.25/1M input."
+
+  gpt-5-nano:
+    tier: economy
+    priority: 5
+    logprobs: false
+    max_tokens: 128000
+    description: "Fastest, cheapest GPT-5. Classification, summarization."
+
+  # ── GPT-4.1 Family (non-reasoning, logprobs, 1M context) ──
+  gpt-4.1:
+    tier: premium
+    priority: 1
+    logprobs: true
+    max_tokens: 32000
+    description: "Best non-reasoning model. 1M context. Logprobs."
+
+  gpt-4.1-mini:
+    tier: standard
+    priority: 2
+    logprobs: true
+    max_tokens: 32000
+    description: "Default. Best cost/quality. 1M context. Logprobs."
+
+  gpt-4.1-nano:
+    tier: economy
+    priority: 3
+    logprobs: true
+    max_tokens: 32000
+    description: "Cheapest with logprobs. Classifier default."
+
+  # ── GPT-4o Family (legacy, logprobs, 128K context) ──
+  gpt-4o:
+    tier: standard
+    priority: 5
+    logprobs: true
+    max_tokens: 16384
+    description: "Previous-gen omni model. 128K context. Logprobs."
+
+  gpt-4o-mini:
+    tier: economy
+    priority: 6
+    logprobs: true
+    max_tokens: 16384
+    description: "Very cheap vision model. 128K context."
+
+  # ── GPT-4.5 ──
+  gpt-4.5-preview:
+    tier: premium
+    priority: 10
+    logprobs: true
+    max_tokens: 16384
+    description: "Research preview. Very expensive. Deprecated July 2025."
+
+  # ── o-Series Reasoning (vision, no logprobs) ──
+  o3:
+    tier: premium
+    priority: 1
+    logprobs: false
+    max_tokens: 100000
+    description: "Most powerful reasoning. Excels at visual tasks."
+
+  o3-pro:
+    tier: premium
+    priority: 0
+    logprobs: false
+    max_tokens: 100000
+    description: "Thinks longer for most reliable responses."
+
+  o4-mini:
+    tier: standard
+    priority: 3
+    logprobs: false
+    max_tokens: 100000
+    description: "Fast reasoning. Exceptional at coding + visual tasks."
+
+  o1:
+    tier: premium
+    priority: 5
+    logprobs: false
+    max_tokens: 100000
+    description: "Previous reasoning model. Superseded by o3."
+
+  o1-pro:
+    tier: premium
+    priority: 6
+    logprobs: false
+    max_tokens: 100000
+    description: "Premium o1. Very expensive."

@@ -1,0 +1,32 @@
+pipeline:
+  name: structured_pdf
+  version: "1.0"
+  description: "Structured PDFs with mixed text, tables, and metadata"
+
+  steps:
+    - name: extraction
+      type: parallel
+      depends_on: []
+      steps:
+        - name: metadata
+          agent: metadata_extract
+          input: image
+          pages: [1]
+
+        - name: text
+          agent: text_extract
+          input: image
+
+        - name: tables
+          agent: table_extract
+          input: image
+
+    - name: merge
+      agent: document_merger
+      input: previous_output_only
+      depends_on: [extraction]
+
+    - name: validate
+      agent: validator
+      input: image_and_previous
+      depends_on: [merge]

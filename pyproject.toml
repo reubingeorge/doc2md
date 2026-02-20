@@ -1,0 +1,105 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "doc2md"
+version = "3.0.0"
+description = "Agentic document-to-markdown converter using composable VLM agents orchestrated through YAML-defined pipelines"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    { name = "Reubin George", email = "george.reubin@gmail.com" },
+]
+keywords = ["document", "markdown", "ocr", "vlm", "ai", "pdf", "extraction", "agents", "pipeline"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Markup :: Markdown",
+    "Typing :: Typed",
+]
+dependencies = [
+    "openai>=1.30",
+    "httpx>=0.27",
+    "pydantic>=2.5",
+    "PyYAML>=6.0",
+    "Jinja2>=3.1",
+    "Pillow>=10.0",
+    "pdf2image>=1.16",
+    "tenacity>=8.2",
+    "rich>=13.0",
+    "click>=8.1",
+    "numpy>=1.24",
+    "thefuzz>=0.22",
+]
+
+[project.optional-dependencies]
+cv = ["opencv-python-headless>=4.8"]
+fast = ["PyMuPDF>=1.23"]
+calibration = ["scikit-learn>=1.3"]
+lang = ["langdetect>=1.0"]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.21",
+    "pytest-cov>=4.1",
+    "mypy>=1.8",
+    "ruff>=0.4",
+    "types-PyYAML",
+    "types-Pillow",
+]
+all = ["doc2md[cv,fast,calibration,lang,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/rgeorge12/doc2md"
+Repository = "https://github.com/rgeorge12/doc2md"
+Issues = "https://github.com/rgeorge12/doc2md/issues"
+
+[project.scripts]
+doc2md = "doc2md.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/doc2md"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/doc2md/",
+    "tests/",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = ["e2e: end-to-end tests requiring API key"]
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+exclude = ["tests/"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.coverage.run]
+source = ["src/doc2md"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true

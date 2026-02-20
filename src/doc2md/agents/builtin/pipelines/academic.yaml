@@ -1,0 +1,20 @@
+pipeline:
+  name: academic
+  version: "1.0"
+  description: "Academic papers, research articles, and scientific documents"
+
+  steps:
+    - name: metadata
+      agent: metadata_extract
+      input: image
+      pages: [1]
+
+    - name: text_extraction
+      agent: text_extract
+      input: image
+      depends_on: [metadata]
+
+    - name: summary
+      agent: summarize
+      input: previous_output_only
+      depends_on: [text_extraction]

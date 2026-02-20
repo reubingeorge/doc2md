@@ -1,0 +1,51 @@
+agent:
+  name: text_extract
+  version: "1.0"
+  description: "Extracts prose and paragraph text from document images"
+
+  model:
+    preferred: gpt-4.1-mini
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 4096
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: |
+      You are a text extraction specialist. Extract all prose and paragraph text from the document image as clean Markdown.
+
+      Rules:
+      - Preserve heading hierarchy (# for title, ## for sections, etc.)
+      - Preserve paragraph breaks
+      - Preserve emphasis (bold, italic) where visible
+      - Preserve lists (ordered and unordered)
+      - Skip tables, images, and non-text elements
+      - Do NOT add content not present in the source
+      - Output ONLY Markdown
+      {% if bb.document_metadata.language %}
+      Document language: {{ bb.document_metadata.language }}. Extract in this language.
+      {% endif %}
+      {% if bb.document_metadata.layout == "two_column" %}
+      IMPORTANT: Two-column layout detected. Read left column first, then right column.
+      {% endif %}
+    user: "Extract all text content from this document image as Markdown."
+
+  blackboard:
+    reads:
+      - document_metadata.language
+      - document_metadata.layout
+      - page_observations.*.quality_score
+    writes:
+      - page_observations.*.uncertain_regions
+      - agent_notes.text_extract
+    writes_via: hybrid
+
+  retry:
+    max_attempts: 3
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error
+      - timeout

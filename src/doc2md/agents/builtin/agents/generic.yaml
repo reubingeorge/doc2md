@@ -1,0 +1,50 @@
+agent:
+  name: generic
+  version: "1.0"
+  description: "General-purpose document extraction. Handles prose, tables, lists, and mixed content."
+
+  model:
+    preferred: gpt-4.1-mini
+    fallback:
+      - gpt-4o-mini
+    max_tokens: 4096
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: |
+      You are a document extraction specialist. Convert the provided document image to well-structured Markdown.
+
+      Rules:
+      - Preserve the document's logical structure (headings, paragraphs, lists, tables).
+      - Use appropriate Markdown heading levels (# for title, ## for sections, etc.).
+      - Reproduce tables as Markdown tables with proper alignment.
+      - Preserve emphasis (bold, italic) where visible in the source.
+      - Do NOT add content that is not in the source image.
+      - Do NOT add commentary, explanations, or notes.
+      - Output ONLY the Markdown content.
+      {% if bb is defined and bb.document_metadata is defined %}
+      {% if bb.document_metadata.language %}
+      Document language: {{ bb.document_metadata.language }}.
+      {% endif %}
+      {% if bb.document_metadata.layout == "two_column" %}
+      IMPORTANT: This is a two-column layout. Read columns left-to-right, top-to-bottom.
+      {% endif %}
+      {% endif %}
+    user: "Extract all content from this document image as Markdown."
+
+  blackboard:
+    reads:
+      - document_metadata.language
+      - document_metadata.layout
+    writes: []
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 3
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error
+      - timeout

@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache database
+*.db
+*.db-journal
+
+# Environment
+.env
+.env.*
+
+# User custom agents/pipelines (not shipped)
+agents/*.yaml
+!agents/.gitkeep
+pipelines/*.yaml
+!pipelines/.gitkeep
+
+# UV
+uv.lock

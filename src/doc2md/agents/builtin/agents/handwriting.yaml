@@ -1,0 +1,45 @@
+agent:
+  name: handwriting
+  version: "1.0"
+  description: "Extracts handwritten text and annotations"
+
+  model:
+    preferred: gpt-4.1
+    fallback:
+      - gpt-4o
+      - gpt-4.1-mini
+    max_tokens: 4096
+    temperature: 0.0
+
+  input: image
+
+  prompt:
+    system: |
+      You are a handwriting recognition specialist. Extract all handwritten text from the document image.
+
+      Rules:
+      - Transcribe handwritten text as accurately as possible
+      - Preserve the logical reading order
+      - Mark uncertain words with [?] suffix
+      - If signatures are present, note them as [Signature: description]
+      - Preserve any annotations or margin notes
+      - Output as clean Markdown
+      {% if bb.document_metadata.language %}
+      Document language: {{ bb.document_metadata.language }}.
+      {% endif %}
+    user: "Extract all handwritten text from this document image."
+
+  blackboard:
+    reads:
+      - document_metadata.language
+    writes:
+      - agent_notes.handwriting
+    writes_via: prompt_elicited
+
+  retry:
+    max_attempts: 3
+    strategy: exponential
+    retry_on:
+      - rate_limit
+      - server_error
+      - timeout

@@ -1,0 +1,18 @@
+pipeline:
+  name: mixed_document
+  version: "1.0"
+  description: "Documents with unknown or mixed content types — routes pages to specialists"
+
+  steps:
+    - name: route
+      type: page_route
+      depends_on: []
+      cross_page_aware: true
+      router:
+        strategy: rules
+        default_agent: generic
+
+    - name: merge
+      agent: document_merger
+      input: previous_output_only
+      depends_on: [route]

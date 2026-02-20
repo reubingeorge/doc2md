@@ -1,0 +1,14 @@
+pipeline:
+  name: handwritten
+  version: "1.0"
+  description: "Handwritten notes, letters, and annotations"
+
+  steps:
+    - name: extract
+      agent: handwriting
+      input: image
+
+    - name: validate
+      agent: validator
+      input: image_and_previous
+      depends_on: [extract]

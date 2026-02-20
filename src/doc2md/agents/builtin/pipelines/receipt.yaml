@@ -1,0 +1,14 @@
+pipeline:
+  name: receipt
+  version: "1.0"
+  description: "Receipts, invoices, and simple financial documents"
+
+  steps:
+    - name: extract
+      agent: generic
+      input: image
+
+    - name: validate
+      agent: validator
+      input: image_and_previous
+      depends_on: [extract]
