@@ -33,15 +33,18 @@ async def execute_parallel(
         raise ValueError(f"Parallel step '{step_config.name}' has no sub-steps")
 
     # Create blackboard copies for each branch
-    branches: list[tuple[StepConfig, Blackboard]] = [
-        (sub, blackboard.copy()) for sub in sub_steps
-    ]
+    branches: list[tuple[StepConfig, Blackboard]] = [(sub, blackboard.copy()) for sub in sub_steps]
 
     # Execute all branches concurrently
     tasks = [
         execute_step(
-            sub, step_input, bb_copy, agent_engine, agent_configs,
-            cache_manager=cache_manager, pipeline_name=pipeline_name,
+            sub,
+            step_input,
+            bb_copy,
+            agent_engine,
+            agent_configs,
+            cache_manager=cache_manager,
+            pipeline_name=pipeline_name,
         )
         for sub, bb_copy in branches
     ]

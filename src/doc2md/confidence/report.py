@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field
 from doc2md.confidence.combiner import SignalResult
 from doc2md.types import ConfidenceLevel
 
-
 # Decision thresholds
 _THRESHOLDS: list[tuple[float, ConfidenceLevel]] = [
     (0.8, ConfidenceLevel.HIGH),
@@ -78,14 +77,12 @@ def aggregate_step_scores(
 
     # weighted_average (default)
     if step_weights:
-        total_weight = sum(
-            step_weights.get(name, 0.0) for name in step_scores
-        )
+        total_weight = sum(step_weights.get(name, 0.0) for name in step_scores)
         if total_weight > 0:
-            return sum(
-                score * step_weights.get(name, 0.0)
-                for name, score in step_scores.items()
-            ) / total_weight
+            return (
+                sum(score * step_weights.get(name, 0.0) for name, score in step_scores.items())
+                / total_weight
+            )
 
     # Equal-weight average fallback
     return sum(step_scores.values()) / len(step_scores)

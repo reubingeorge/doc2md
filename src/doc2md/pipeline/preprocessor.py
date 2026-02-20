@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import io
 import logging
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
@@ -19,9 +20,11 @@ _PREPROCESS_REGISTRY: dict[str, Callable[..., bytes]] = {}
 
 def _register(name: str) -> Callable:
     """Decorator to register an image preprocessing function."""
+
     def decorator(fn: Callable[..., bytes]) -> Callable[..., bytes]:
         _PREPROCESS_REGISTRY[name] = fn
         return fn
+
     return decorator
 
 
@@ -209,9 +212,7 @@ def compute_quality(image_bytes: bytes) -> ImageQuality:
     # Blur (Laplacian variance)
     if arr.shape[0] >= 3 and arr.shape[1] >= 3:
         laplacian = (
-            arr[:-2, 1:-1] + arr[2:, 1:-1]
-            + arr[1:-1, :-2] + arr[1:-1, 2:]
-            - 4 * arr[1:-1, 1:-1]
+            arr[:-2, 1:-1] + arr[2:, 1:-1] + arr[1:-1, :-2] + arr[1:-1, 2:] - 4 * arr[1:-1, 1:-1]
         )
         variance = float(np.var(laplacian))
         if variance >= 500:

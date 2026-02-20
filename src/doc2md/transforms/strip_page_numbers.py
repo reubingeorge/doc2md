@@ -17,9 +17,9 @@ def strip_page_numbers(markdown: str, **kwargs: str) -> str:
     - Bare numbers on their own line (1-4 digits)
     """
     patterns = [
-        r"^\s*[Pp]age\s+\d+\s*$",       # "Page 3"
-        r"^\s*-\s*\d+\s*-\s*$",          # "- 3 -"
-        r"^\s*\d{1,4}\s*$",              # bare "3"
+        r"^\s*[Pp]age\s+\d+\s*$",  # "Page 3"
+        r"^\s*-\s*\d+\s*-\s*$",  # "- 3 -"
+        r"^\s*\d{1,4}\s*$",  # bare "3"
     ]
 
     lines = markdown.split("\n")

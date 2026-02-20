@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class SignalResult(BaseModel):
@@ -39,9 +39,7 @@ def combine_signals(
 
     # Weighted average
     combined = sum(
-        available[name].score * weight
-        for name, weight in effective.items()
-        if name in available
+        available[name].score * weight for name, weight in effective.items() if name in available
     )
 
     return combined, effective
@@ -60,9 +58,7 @@ def _redistribute_weights(
         return {}
 
     # Calculate total weight of available signals
-    available_weight_sum = sum(
-        original.get(name, 0.0) for name in available_names
-    )
+    available_weight_sum = sum(original.get(name, 0.0) for name in available_names)
 
     if available_weight_sum <= 0:
         # Equal weights if no original weights defined for available signals
@@ -70,7 +66,4 @@ def _redistribute_weights(
         return {name: equal for name in available_names}
 
     # Normalize: each available signal gets weight / sum(available_weights)
-    return {
-        name: original.get(name, 0.0) / available_weight_sum
-        for name in available_names
-    }
+    return {name: original.get(name, 0.0) / available_weight_sum for name in available_names}

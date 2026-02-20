@@ -1,9 +1,5 @@
 """Tests for config hierarchy."""
 
-import os
-
-import pytest
-
 from doc2md.config.hierarchy import (
     _coerce_env_value,
     _load_yaml_config,

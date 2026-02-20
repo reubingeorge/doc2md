@@ -53,9 +53,7 @@ class TestParallelExecution:
         }
 
         bb = Blackboard()
-        result = await execute_step(
-            parallel_step, StepInput(), bb, engine, configs
-        )
+        result = await execute_step(parallel_step, StepInput(), bb, engine, configs)
 
         assert call_count == 2
         assert "Result from summarize" in result.markdown

@@ -6,7 +6,14 @@ from doc2md.agents.engine import AgentEngine
 from doc2md.blackboard.board import Blackboard
 from doc2md.config.schema import PipelineConfig, StepConfig, StepType
 from doc2md.pipeline.engine import PipelineEngine
-from doc2md.types import AgentConfig, ModelConfig, PromptConfig, TokenUsage, VLMResponse, ValidationRule, ConfidenceConfig
+from doc2md.types import (
+    AgentConfig,
+    ConfidenceConfig,
+    ModelConfig,
+    PromptConfig,
+    TokenUsage,
+    VLMResponse,
+)
 
 
 def _mock_response(content: str = "# Title\n\nContent here [confidence: HIGH]") -> VLMResponse:
@@ -95,8 +102,9 @@ class TestConfidencePipelineIntegration:
             name="test_pipe",
             steps=[
                 StepConfig(name="extract", type=StepType.AGENT, agent="test"),
-                StepConfig(name="validate", type=StepType.AGENT, agent="test",
-                           depends_on=["extract"]),
+                StepConfig(
+                    name="validate", type=StepType.AGENT, agent="test", depends_on=["extract"]
+                ),
             ],
         )
 

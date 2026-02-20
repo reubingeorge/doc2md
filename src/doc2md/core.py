@@ -92,7 +92,9 @@ class Doc2Md:
 
         # Execute pipeline
         pipeline_engine = PipelineEngine(
-            agent_engine, agent_configs, cache_manager=self._cache_manager,
+            agent_engine,
+            agent_configs,
+            cache_manager=self._cache_manager,
         )
         result = await pipeline_engine.execute(pipeline_config, page_images, blackboard)
 
@@ -161,7 +163,9 @@ class Doc2Md:
         return pc, ac, None
 
     def _resolve_pipeline(
-        self, pipeline_name: str, model: str | None,
+        self,
+        pipeline_name: str,
+        model: str | None,
     ) -> tuple[PipelineConfig, dict[str, AgentConfig]]:
         """Load a pipeline and all its referenced agents from registries."""
         pipeline_config = self._pipeline_registry.get(pipeline_name)
@@ -176,7 +180,9 @@ class Doc2Md:
         return pipeline_config, agent_configs
 
     def _resolve_agent(
-        self, agent_name: str, model: str | None,
+        self,
+        agent_name: str,
+        model: str | None,
     ) -> tuple[PipelineConfig, dict[str, AgentConfig]]:
         """Wrap a single agent in an implicit pipeline."""
         config = self._agent_registry.get(agent_name)
@@ -192,9 +198,7 @@ class Doc2Md:
 
     def _get_vlm_client(self) -> AsyncVLMClient:
         if self._vlm_client is None:
-            self._vlm_client = AsyncVLMClient(
-                api_key=self._api_key, base_url=self._base_url
-            )
+            self._vlm_client = AsyncVLMClient(api_key=self._api_key, base_url=self._base_url)
         return self._vlm_client
 
     @staticmethod
@@ -270,7 +274,9 @@ def convert_batch(
         results = await pool.process_batch(
             converter.convert_async,
             file_paths=input_paths,
-            agent=agent, pipeline=pipeline, model=model,
+            agent=agent,
+            pipeline=pipeline,
+            model=model,
         )
         return results
 

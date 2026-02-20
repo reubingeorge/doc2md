@@ -1,9 +1,8 @@
 """Tests for built-in code step transforms."""
 
-from doc2md.pipeline.step_executor import get_code_step
-
 # Import to trigger registration
 import doc2md.transforms  # noqa: F401
+from doc2md.pipeline.step_executor import get_code_step
 
 
 class TestStripPageNumbers:

@@ -3,7 +3,6 @@
 import time
 
 from doc2md.cache.stats import CacheEntry, CacheStats
-from doc2md.types import TokenUsage
 
 
 class TestCacheEntry:
@@ -31,7 +30,8 @@ class TestCacheEntry:
     def test_size_bytes_includes_blackboard_writes(self):
         entry_plain = CacheEntry(key="k1", markdown="x")
         entry_bb = CacheEntry(
-            key="k2", markdown="x",
+            key="k2",
+            markdown="x",
             blackboard_writes={"region": {"key": "a long value" * 100}},
         )
         assert entry_bb.size_bytes > entry_plain.size_bytes

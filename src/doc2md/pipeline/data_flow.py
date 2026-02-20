@@ -30,21 +30,21 @@ def resolve_step_input(
 
     if depends_on:
         dep_outputs = {
-            name: step_results[name].markdown
-            for name in depends_on
-            if name in step_results
+            name: step_results[name].markdown for name in depends_on if name in step_results
         }
 
         if input_mode == InputMode.PREVIOUS_OUTPUTS:
             step_input.previous_outputs = dep_outputs
-        elif input_mode in (
-            InputMode.PREVIOUS_OUTPUT,
-            InputMode.IMAGE_AND_PREVIOUS,
-            InputMode.PREVIOUS_OUTPUT_ONLY,
+        elif (
+            input_mode
+            in (
+                InputMode.PREVIOUS_OUTPUT,
+                InputMode.IMAGE_AND_PREVIOUS,
+                InputMode.PREVIOUS_OUTPUT_ONLY,
+            )
+            and dep_outputs
         ):
-            # Use the last dependency's output as the single previous output
-            if dep_outputs:
-                last_dep = depends_on[-1]
-                step_input.previous_output = dep_outputs.get(last_dep)
+            last_dep = depends_on[-1]
+            step_input.previous_output = dep_outputs.get(last_dep)
 
     return step_input

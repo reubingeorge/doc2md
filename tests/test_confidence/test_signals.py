@@ -1,11 +1,11 @@
 """Tests for individual confidence signals."""
 
-from doc2md.confidence.signals.vlm_assessment import compute_vlm_self_assessment
-from doc2md.confidence.signals.logprobs import compute_logprobs
-from doc2md.confidence.signals.validation import compute_validation_pass_rate
 from doc2md.confidence.signals.completeness import compute_completeness
 from doc2md.confidence.signals.consistency import compute_consistency
 from doc2md.confidence.signals.image_quality import compute_image_quality
+from doc2md.confidence.signals.logprobs import compute_logprobs
+from doc2md.confidence.signals.validation import compute_validation_pass_rate
+from doc2md.confidence.signals.vlm_assessment import compute_vlm_self_assessment
 from doc2md.types import ConfidenceLevel, ValidationRule
 
 

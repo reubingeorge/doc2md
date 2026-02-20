@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -10,14 +10,14 @@ from pydantic import BaseModel, Field
 from doc2md.types import InputMode
 
 
-class StepType(str, Enum):
+class StepType(StrEnum):
     AGENT = "agent"
     PARALLEL = "parallel"
     PAGE_ROUTE = "page_route"
     CODE = "code"
 
 
-class RouterStrategy(str, Enum):
+class RouterStrategy(StrEnum):
     VLM = "vlm"
     RULES = "rules"
     HYBRID = "hybrid"

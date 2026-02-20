@@ -44,7 +44,9 @@ def _merge_document_metadata(target: Blackboard, source: Blackboard) -> None:
         if target_val is not None and target_val != source_val:
             logger.warning(
                 "Blackboard merge conflict: document_metadata.%s: %r vs %r (using latter)",
-                field_name, target_val, source_val,
+                field_name,
+                target_val,
+                source_val,
             )
         setattr(target.document_metadata, field_name, source_val)
 

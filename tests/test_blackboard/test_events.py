@@ -29,49 +29,45 @@ class TestEventLog:
     def test_append_and_len(self):
         log = EventLog()
         assert len(log) == 0
-        log.append(BlackboardEvent(
-            event_type=EventType.WRITE, region="r", key="k", agent_name="a"
-        ))
+        log.append(BlackboardEvent(event_type=EventType.WRITE, region="r", key="k", agent_name="a"))
         assert len(log) == 1
 
     def test_events_returns_copy(self):
         log = EventLog()
-        log.append(BlackboardEvent(
-            event_type=EventType.WRITE, region="r", key="k", agent_name="a"
-        ))
+        log.append(BlackboardEvent(event_type=EventType.WRITE, region="r", key="k", agent_name="a"))
         events = log.events
         events.clear()
         assert len(log) == 1  # Original unaffected
 
     def test_query_by_agent(self):
         log = EventLog()
-        log.append(BlackboardEvent(
-            event_type=EventType.WRITE, region="r", key="k", agent_name="agent_a"
-        ))
-        log.append(BlackboardEvent(
-            event_type=EventType.READ, region="r", key="k", agent_name="agent_b"
-        ))
+        log.append(
+            BlackboardEvent(event_type=EventType.WRITE, region="r", key="k", agent_name="agent_a")
+        )
+        log.append(
+            BlackboardEvent(event_type=EventType.READ, region="r", key="k", agent_name="agent_b")
+        )
         assert len(log.query_by_agent("agent_a")) == 1
         assert len(log.query_by_agent("agent_b")) == 1
         assert len(log.query_by_agent("agent_c")) == 0
 
     def test_query_by_region(self):
         log = EventLog()
-        log.append(BlackboardEvent(
-            event_type=EventType.WRITE, region="step_outputs", key="k", agent_name="a"
-        ))
-        log.append(BlackboardEvent(
-            event_type=EventType.WRITE, region="agent_notes", key="k", agent_name="a"
-        ))
+        log.append(
+            BlackboardEvent(
+                event_type=EventType.WRITE, region="step_outputs", key="k", agent_name="a"
+            )
+        )
+        log.append(
+            BlackboardEvent(
+                event_type=EventType.WRITE, region="agent_notes", key="k", agent_name="a"
+            )
+        )
         assert len(log.query_by_region("step_outputs")) == 1
 
     def test_query_writes_and_reads(self):
         log = EventLog()
-        log.append(BlackboardEvent(
-            event_type=EventType.WRITE, region="r", key="k", agent_name="a"
-        ))
-        log.append(BlackboardEvent(
-            event_type=EventType.READ, region="r", key="k", agent_name="b"
-        ))
+        log.append(BlackboardEvent(event_type=EventType.WRITE, region="r", key="k", agent_name="a"))
+        log.append(BlackboardEvent(event_type=EventType.READ, region="r", key="k", agent_name="b"))
         assert len(log.query_writes()) == 1
         assert len(log.query_reads()) == 1

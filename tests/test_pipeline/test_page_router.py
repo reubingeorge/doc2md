@@ -18,7 +18,6 @@ from doc2md.types import (
     AgentConfig,
     PromptConfig,
     StepResult,
-    TokenUsage,
 )
 
 
@@ -86,8 +85,8 @@ class TestExecutePageRoute:
         result = await execute_page_route(step, step_input, bb, engine, configs)
 
         assert call_log[0] == "cover"  # page 1
-        assert call_log[1] == "text"   # page 2
-        assert call_log[2] == "text"   # page 3
+        assert call_log[1] == "text"  # page 2
+        assert call_log[2] == "text"  # page 3
         assert "Page by cover" in result.markdown
 
     async def test_cross_page_grouping(self):

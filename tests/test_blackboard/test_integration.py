@@ -2,8 +2,6 @@
 
 from unittest.mock import AsyncMock
 
-import pytest
-
 from doc2md.agents.engine import AgentEngine
 from doc2md.blackboard.board import Blackboard
 from doc2md.types import (
@@ -42,13 +40,15 @@ class TestBlackboardIntegration:
         )
 
         mock_vlm = AsyncMock()
-        mock_vlm.send_request = AsyncMock(return_value=_make_vlm_response(
-            "---\ntitle: Test\n---\n\n"
-            "<blackboard>\n"
-            "document_metadata:\n"
-            "  language: fr\n"
-            "</blackboard>"
-        ))
+        mock_vlm.send_request = AsyncMock(
+            return_value=_make_vlm_response(
+                "---\ntitle: Test\n---\n\n"
+                "<blackboard>\n"
+                "document_metadata:\n"
+                "  language: fr\n"
+                "</blackboard>"
+            )
+        )
 
         engine = AgentEngine(mock_vlm)
         result1 = await engine.execute(
@@ -74,9 +74,9 @@ class TestBlackboardIntegration:
             ),
         )
 
-        mock_vlm.send_request = AsyncMock(return_value=_make_vlm_response(
-            "# Chapitre 1\n\nLe texte en français."
-        ))
+        mock_vlm.send_request = AsyncMock(
+            return_value=_make_vlm_response("# Chapitre 1\n\nLe texte en français.")
+        )
 
         result2 = await engine.execute(
             agent_config=text_agent,
@@ -94,9 +94,11 @@ class TestBlackboardIntegration:
         bb = Blackboard()
 
         mock_vlm = AsyncMock()
-        mock_vlm.send_request = AsyncMock(return_value=_make_vlm_response(
-            "Content\n<blackboard>\ndocument_metadata:\n  layout: two_column\n</blackboard>"
-        ))
+        mock_vlm.send_request = AsyncMock(
+            return_value=_make_vlm_response(
+                "Content\n<blackboard>\ndocument_metadata:\n  layout: two_column\n</blackboard>"
+            )
+        )
         engine = AgentEngine(mock_vlm)
 
         agent = AgentConfig(

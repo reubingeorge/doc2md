@@ -159,9 +159,11 @@ def _convert_batch(
         results = await pool.process_batch(
             converter.convert_async,
             file_paths=[str(f) for f in files],
-            agent=agent, pipeline=pipeline, model=model,
+            agent=agent,
+            pipeline=pipeline,
+            model=model,
         )
-        for file, result in zip(files, results):
+        for file, result in zip(files, results, strict=False):
             out_path = out_dir / f"{file.stem}.md"
             out_path.write_text(result.markdown)
 
@@ -201,7 +203,10 @@ def _print_summary(result: object, verbose: int) -> None:
         table.add_row("Human review", "[yellow]Needed[/yellow]")
 
     usage = result.token_usage
-    table.add_row("Tokens", f"{usage.total_tokens:,} (prompt: {usage.prompt_tokens:,}, completion: {usage.completion_tokens:,})")
+    table.add_row(
+        "Tokens",
+        f"{usage.total_tokens:,} (prompt: {usage.prompt_tokens:,}, completion: {usage.completion_tokens:,})",
+    )
 
     error_console.print(table)
 

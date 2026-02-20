@@ -2,8 +2,6 @@
 
 from unittest.mock import AsyncMock, patch
 
-import pytest
-
 from doc2md.core import Doc2Md
 from doc2md.types import TokenUsage, VLMResponse
 
@@ -69,9 +67,7 @@ pipeline:
         assert result.pages_processed == 1
         assert "# Extracted Content" in result.markdown
 
-    async def test_convert_single_agent_wraps_in_pipeline(
-        self, tmp_path, sample_image_bytes
-    ):
+    async def test_convert_single_agent_wraps_in_pipeline(self, tmp_path, sample_image_bytes):
         img_path = tmp_path / "test.png"
         img_path.write_bytes(sample_image_bytes)
 

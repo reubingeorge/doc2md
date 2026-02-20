@@ -5,6 +5,7 @@ import pytest
 def sample_image_bytes():
     """Minimal valid PNG for testing (1x1 white pixel)."""
     import base64
+
     return base64.b64decode(
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4"
         "nGP4z8BQDwAEgAF/pooBPQAAAABJRU5ErkJggg=="

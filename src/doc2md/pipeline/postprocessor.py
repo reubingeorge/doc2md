@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Callable
+from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +14,11 @@ _POSTPROCESS_REGISTRY: dict[str, Callable[..., str]] = {}
 
 def _register(name: str) -> Callable:
     """Decorator to register a markdown postprocessing function."""
+
     def decorator(fn: Callable[..., str]) -> Callable[..., str]:
         _POSTPROCESS_REGISTRY[name] = fn
         return fn
+
     return decorator
 
 
@@ -46,7 +48,7 @@ def normalize_headings(markdown: str) -> str:
         # Fix missing space after #
         heading_match = re.match(r"^(#{1,6})([^ #])", stripped)
         if heading_match:
-            stripped = heading_match.group(1) + " " + stripped[len(heading_match.group(1)):]
+            stripped = heading_match.group(1) + " " + stripped[len(heading_match.group(1)) :]
 
         # Check if it's a heading
         heading_match = re.match(r"^(#{1,6})\s", stripped)
@@ -156,12 +158,12 @@ def strip_artifacts(markdown: str, patterns: list[str] | None = None) -> str:
     - OCR artifacts like stray special characters
     """
     default_patterns = [
-        r"---\s*Page\s+\d+\s*---",       # Page break markers
-        r"^_{10,}$",                       # Long underscore lines
-        r"^-{10,}$",                       # Long dash lines
-        r"^={10,}$",                       # Long equals lines
-        r"\[?\[image\]\]?",                # [image] placeholders
-        r"<\|endoftext\|>",               # Model artifacts
+        r"---\s*Page\s+\d+\s*---",  # Page break markers
+        r"^_{10,}$",  # Long underscore lines
+        r"^-{10,}$",  # Long dash lines
+        r"^={10,}$",  # Long equals lines
+        r"\[?\[image\]\]?",  # [image] placeholders
+        r"<\|endoftext\|>",  # Model artifacts
     ]
     all_patterns = (patterns or []) + default_patterns
 
@@ -203,7 +205,15 @@ def embed_confidence(markdown: str, score: float | None = None) -> str:
     if score is None:
         return markdown
 
-    level = "HIGH" if score >= 0.8 else "MEDIUM" if score >= 0.6 else "LOW" if score >= 0.3 else "FAILED"
+    level = (
+        "HIGH"
+        if score >= 0.8
+        else "MEDIUM"
+        if score >= 0.6
+        else "LOW"
+        if score >= 0.3
+        else "FAILED"
+    )
     frontmatter = f"---\nconfidence: {score:.2f}\nconfidence_level: {level}\n---\n\n"
 
     # Don't double-add if frontmatter already exists
@@ -228,10 +238,7 @@ def validate_markdown(markdown: str) -> bool:
 
     # Check for unclosed code blocks
     code_blocks = markdown.count("```")
-    if code_blocks % 2 != 0:
-        return False
-
-    return True
+    return code_blocks % 2 == 0
 
 
 # ── Orchestrator ──

@@ -1,7 +1,5 @@
 """Tests for CacheManager (L1 + L2 orchestration)."""
 
-import time
-
 from doc2md.cache.manager import CacheManager
 from doc2md.cache.stats import CacheEntry
 from doc2md.types import TokenUsage
@@ -15,8 +13,7 @@ class TestCacheManager:
     def test_store_and_lookup(self, tmp_path):
         mgr = CacheManager(disk_path=tmp_path / "cache.db")
         try:
-            entry = _entry("k1", "# Hello",
-                           token_usage=TokenUsage(total_tokens=100))
+            entry = _entry("k1", "# Hello", token_usage=TokenUsage(total_tokens=100))
             mgr.store("k1", entry)
             result = mgr.lookup("k1")
             assert result is not None
@@ -39,8 +36,7 @@ class TestCacheManager:
     def test_l2_promotion_to_l1(self, tmp_path):
         mgr = CacheManager(disk_path=tmp_path / "cache.db")
         try:
-            entry = _entry("k1", "promoted",
-                           token_usage=TokenUsage(total_tokens=50))
+            entry = _entry("k1", "promoted", token_usage=TokenUsage(total_tokens=50))
             mgr.store("k1", entry)
             # Clear L1 only
             mgr._l1.clear()

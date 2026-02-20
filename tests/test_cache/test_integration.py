@@ -1,6 +1,6 @@
 """Integration test: cache with agent engine pipeline execution."""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 from doc2md.agents.engine import AgentEngine
 from doc2md.blackboard.board import Blackboard
@@ -103,10 +103,14 @@ class TestCacheWithAgentEngine:
         config = _make_agent_config()
 
         await engine.execute(
-            agent_config=config, image_bytes=sample_image_bytes, step_name="s",
+            agent_config=config,
+            image_bytes=sample_image_bytes,
+            step_name="s",
         )
         await engine.execute(
-            agent_config=config, image_bytes=sample_image_bytes, step_name="s",
+            agent_config=config,
+            image_bytes=sample_image_bytes,
+            step_name="s",
         )
         assert mock_client.send_request.call_count == 2
 
@@ -125,17 +129,23 @@ class TestCacheWithAgentEngine:
             # First call — writes to blackboard
             bb1 = Blackboard()
             await engine.execute(
-                agent_config=config, image_bytes=sample_image_bytes,
-                blackboard=bb1, cache_manager=cache_mgr,
-                pipeline_name="p", step_name="s",
+                agent_config=config,
+                image_bytes=sample_image_bytes,
+                blackboard=bb1,
+                cache_manager=cache_mgr,
+                pipeline_name="p",
+                step_name="s",
             )
 
             # Second call — cached, should replay writes to fresh blackboard
             bb2 = Blackboard()
             result2 = await engine.execute(
-                agent_config=config, image_bytes=sample_image_bytes,
-                blackboard=bb2, cache_manager=cache_mgr,
-                pipeline_name="p", step_name="s",
+                agent_config=config,
+                image_bytes=sample_image_bytes,
+                blackboard=bb2,
+                cache_manager=cache_mgr,
+                pipeline_name="p",
+                step_name="s",
             )
             assert result2.cached is True
             assert result2.blackboard_writes != {}
@@ -153,13 +163,19 @@ class TestCacheWithAgentEngine:
 
             # Miss
             await engine.execute(
-                agent_config=config, image_bytes=sample_image_bytes,
-                cache_manager=cache_mgr, pipeline_name="p", step_name="s",
+                agent_config=config,
+                image_bytes=sample_image_bytes,
+                cache_manager=cache_mgr,
+                pipeline_name="p",
+                step_name="s",
             )
             # Hit
             await engine.execute(
-                agent_config=config, image_bytes=sample_image_bytes,
-                cache_manager=cache_mgr, pipeline_name="p", step_name="s",
+                agent_config=config,
+                image_bytes=sample_image_bytes,
+                cache_manager=cache_mgr,
+                pipeline_name="p",
+                step_name="s",
             )
 
             stats = cache_mgr.stats()

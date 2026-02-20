@@ -7,7 +7,8 @@ from the extracted markdown or image, without additional VLM cost.
 from __future__ import annotations
 
 import re
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 # Registry of code-computed writers: function_name → (callable, output_key)
 _WRITER_REGISTRY: dict[str, tuple[Callable[..., Any], str]] = {}
@@ -15,9 +16,11 @@ _WRITER_REGISTRY: dict[str, tuple[Callable[..., Any], str]] = {}
 
 def blackboard_writer(output_key: str) -> Callable:
     """Decorator to register a code-computed blackboard writer."""
+
     def decorator(fn: Callable) -> Callable:
         _WRITER_REGISTRY[fn.__name__] = (fn, output_key)
         return fn
+
     return decorator
 
 
@@ -44,9 +47,7 @@ def detect_continuations(markdown: str, page_num: int) -> bool:
     if stripped.endswith("|"):
         return True
     # Ends without sentence-terminating punctuation
-    if stripped[-1] not in ".!?\"')":
-        return True
-    return False
+    return stripped[-1] not in ".!?\"')"
 
 
 @blackboard_writer("page_observations.{page_num}.table_count")

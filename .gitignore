@@ -48,3 +48,9 @@ pipelines/*.yaml
 
 # UV
 uv.lock
+
+# Project-local files (not shipped)
+CLAUDE.md
+bootstrap.sh
+tasks.md
+openai-models-vision-reference.md

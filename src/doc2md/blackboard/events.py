@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from enum import Enum
+import time
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
-import time
 
-
-class EventType(str, Enum):
+class EventType(StrEnum):
     READ = "READ"
     WRITE = "WRITE"
 

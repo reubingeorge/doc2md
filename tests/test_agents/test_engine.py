@@ -45,9 +45,7 @@ class TestAgentEngine:
         assert result.token_usage.total_tokens == 150
         assert result.model_used == "gpt-4.1-mini"
 
-    async def test_execute_sends_image_for_image_mode(
-        self, engine, mock_vlm, sample_image_bytes
-    ):
+    async def test_execute_sends_image_for_image_mode(self, engine, mock_vlm, sample_image_bytes):
         await engine.execute(
             agent_config=_make_agent(InputMode.IMAGE),
             image_bytes=sample_image_bytes,

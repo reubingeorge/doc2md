@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +30,7 @@ def calibrate(
 
     if method in ("platt_scaling", "isotonic"):
         logger.debug(
-            "Calibration method '%s' requires trained model; "
-            "falling back to manual.",
+            "Calibration method '%s' requires trained model; falling back to manual.",
             method,
         )
         return _manual_calibrate(raw_score, manual_curve or [])

@@ -82,9 +82,7 @@ def _serialize_value(obj: Any) -> Any:
     if hasattr(obj, "model_dump"):
         return obj.model_dump(exclude_none=True)
     if isinstance(obj, dict):
-        return {
-            k: _serialize_value(v) for k, v in obj.items()
-        }
+        return {k: _serialize_value(v) for k, v in obj.items()}
     return copy.deepcopy(obj)
 
 

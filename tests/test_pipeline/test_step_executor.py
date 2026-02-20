@@ -9,8 +9,8 @@ from doc2md.config.schema import StepConfig, StepType
 from doc2md.pipeline.data_flow import StepInput
 from doc2md.pipeline.step_executor import (
     execute_step,
-    register_code_step,
     get_code_step,
+    register_code_step,
 )
 from doc2md.types import (
     AgentConfig,
@@ -18,7 +18,6 @@ from doc2md.types import (
     PromptConfig,
     StepResult,
     TokenUsage,
-    VLMResponse,
 )
 
 
@@ -31,13 +30,15 @@ def _make_agent_config(name: str = "test_agent") -> AgentConfig:
 
 def _mock_engine() -> AsyncMock:
     engine = AsyncMock()
-    engine.execute = AsyncMock(return_value=StepResult(
-        step_name="extract",
-        agent_name="test_agent",
-        markdown="# Extracted",
-        token_usage=TokenUsage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
-        model_used="gpt-4.1-mini",
-    ))
+    engine.execute = AsyncMock(
+        return_value=StepResult(
+            step_name="extract",
+            agent_name="test_agent",
+            markdown="# Extracted",
+            token_usage=TokenUsage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
+            model_used="gpt-4.1-mini",
+        )
+    )
     return engine
 
 
@@ -56,7 +57,9 @@ class TestExecuteAgentStep:
 
     async def test_agent_step_text_only(self):
         step = StepConfig(
-            name="summarize", type=StepType.AGENT, agent="test_agent",
+            name="summarize",
+            type=StepType.AGENT,
+            agent="test_agent",
             input=InputMode.PREVIOUS_OUTPUT_ONLY,
         )
         step_input = StepInput(previous_output="Some content")

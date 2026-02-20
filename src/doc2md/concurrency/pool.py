@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from doc2md.concurrency.rate_limiter import RateLimiter
-from doc2md.errors.exceptions import PageLevelError
 
 if TYPE_CHECKING:
     from doc2md.types import ConversionResult
@@ -72,11 +71,13 @@ class ConcurrencyPool:
         for i, result in enumerate(results):
             if isinstance(result, Exception):
                 logger.error("File %s failed: %s", file_paths[i], result)
-                final.append(CR(
-                    markdown="",
-                    pages_processed=0,
-                    pages_failed=[0],
-                ))
+                final.append(
+                    CR(
+                        markdown="",
+                        pages_processed=0,
+                        pages_failed=[0],
+                    )
+                )
             else:
                 final.append(result)
 

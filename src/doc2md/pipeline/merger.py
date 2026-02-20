@@ -41,8 +41,7 @@ async def merge_with_agent(
         )
 
     combined_input = "\n\n---\n\n".join(
-        f"## Section: {name}\n\n{content}"
-        for name, content in outputs.items()
+        f"## Section: {name}\n\n{content}" for name, content in outputs.items()
     )
 
     result = await agent_engine.execute(

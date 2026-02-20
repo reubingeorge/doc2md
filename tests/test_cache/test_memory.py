@@ -4,7 +4,6 @@ import time
 
 from doc2md.cache.memory import MemoryCache
 from doc2md.cache.stats import CacheEntry
-from doc2md.types import TokenUsage
 
 
 def _entry(key: str, markdown: str = "test", **kwargs) -> CacheEntry:

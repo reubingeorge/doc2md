@@ -65,8 +65,7 @@ class TestMergeParallel:
         target = Blackboard()
         branch = target.copy()
         branch.write(
-            "confidence_signals", "page_1.extract",
-            {"self_assessment": 0.85}, writer="engine"
+            "confidence_signals", "page_1.extract", {"self_assessment": 0.85}, writer="engine"
         )
         merge_parallel(target, [branch])
         assert target.confidence_signals["page_1.extract"]["self_assessment"] == 0.85
@@ -77,8 +76,6 @@ class TestMergeParallel:
             uncertain_regions=[UncertainRegion(area="top")]
         )
         branch = target.copy()
-        branch.page_observations[1].uncertain_regions.append(
-            UncertainRegion(area="bottom")
-        )
+        branch.page_observations[1].uncertain_regions.append(UncertainRegion(area="bottom"))
         merge_parallel(target, [branch])
         assert len(target.page_observations[1].uncertain_regions) == 2

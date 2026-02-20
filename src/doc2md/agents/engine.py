@@ -46,8 +46,10 @@ class AgentEngine:
             image_bytes, quality = run_preprocessing(image_bytes, agent_config.preprocessing)
             if blackboard and page_num is not None:
                 blackboard.write(
-                    "page_observations", f"page_{page_num}.quality_score",
-                    quality.overall, writer=resolved_step,
+                    "page_observations",
+                    f"page_{page_num}.quality_score",
+                    quality.overall,
+                    writer=resolved_step,
                 )
 
         # Read subscribed blackboard regions for prompt context
@@ -63,14 +65,22 @@ class AgentEngine:
 
         # Check cache before VLM call
         cached_result = self._check_cache(
-            cache_manager, image_bytes, pipeline_name, resolved_step,
-            agent_config, system_prompt, user_prompt, bb_context,
+            cache_manager,
+            image_bytes,
+            pipeline_name,
+            resolved_step,
+            agent_config,
+            system_prompt,
+            user_prompt,
+            bb_context,
         )
         if cached_result is not None:
             logger.info("Cache hit for step '%s' agent '%s'", resolved_step, agent_config.name)
             # Re-apply blackboard writes from cached result
             if blackboard and cached_result.blackboard_writes:
-                self._apply_blackboard_writes(blackboard, cached_result.blackboard_writes, resolved_step)
+                self._apply_blackboard_writes(
+                    blackboard, cached_result.blackboard_writes, resolved_step
+                )
             return cached_result
 
         vlm_response = await self._vlm.send_request(
@@ -109,8 +119,15 @@ class AgentEngine:
 
         # Store in cache
         self._store_in_cache(
-            cache_manager, result, image_bytes, pipeline_name,
-            resolved_step, agent_config, system_prompt, user_prompt, bb_context,
+            cache_manager,
+            result,
+            image_bytes,
+            pipeline_name,
+            resolved_step,
+            agent_config,
+            system_prompt,
+            user_prompt,
+            bb_context,
         )
 
         return result

@@ -3,15 +3,16 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import random
-from typing import Any, Awaitable, Callable, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import Any, TypeVar
 
 import openai
 
 from doc2md.errors.exceptions import (
     Doc2MdError,
-    RecoverableError,
     TerminalError,
     TransientError,
 )
@@ -32,38 +33,49 @@ def classify_openai_error(exc: Exception) -> Doc2MdError:
         if hasattr(exc, "response") and exc.response:
             retry_after_str = exc.response.headers.get("retry-after")
             if retry_after_str:
-                try:
+                with contextlib.suppress(ValueError):
                     retry_after = float(retry_after_str)
-                except ValueError:
-                    pass
         return TransientError(
-            str(exc), error_type="rate_limit",
-            http_status=429, retry_after=retry_after, original=exc,
+            str(exc),
+            error_type="rate_limit",
+            http_status=429,
+            retry_after=retry_after,
+            original=exc,
         )
     if isinstance(exc, (openai.InternalServerError,)):
         status = getattr(exc, "status_code", 500)
         return TransientError(
-            str(exc), error_type="server_error",
-            http_status=status, original=exc,
+            str(exc),
+            error_type="server_error",
+            http_status=status,
+            original=exc,
         )
     if isinstance(exc, (openai.APIConnectionError, openai.APITimeoutError)):
         return TransientError(
-            str(exc), error_type="timeout", original=exc,
+            str(exc),
+            error_type="timeout",
+            original=exc,
         )
     if isinstance(exc, openai.AuthenticationError):
         return TerminalError(
-            str(exc), error_type="auth_failure",
-            http_status=401, recoverable_with_fallback=False,
+            str(exc),
+            error_type="auth_failure",
+            http_status=401,
+            recoverable_with_fallback=False,
         )
     if isinstance(exc, openai.NotFoundError):
         return TerminalError(
-            str(exc), error_type="model_not_found",
-            http_status=404, recoverable_with_fallback=True,
+            str(exc),
+            error_type="model_not_found",
+            http_status=404,
+            recoverable_with_fallback=True,
         )
     if isinstance(exc, openai.BadRequestError):
         return TerminalError(
-            str(exc), error_type="bad_input",
-            http_status=400, recoverable_with_fallback=False,
+            str(exc),
+            error_type="bad_input",
+            http_status=400,
+            recoverable_with_fallback=False,
         )
     return TerminalError(str(exc), error_type="unknown")
 
@@ -76,7 +88,7 @@ def compute_wait(
 ) -> float:
     """Compute wait time for a retry attempt."""
     if strategy == RetryStrategy.EXPONENTIAL:
-        wait = initial_wait * (2 ** attempt)
+        wait = initial_wait * (2**attempt)
     elif strategy == RetryStrategy.LINEAR:
         wait = initial_wait * (attempt + 1)
     else:  # FIXED
@@ -110,25 +122,33 @@ async def retry_with_fallback(
 
             if isinstance(classified, TransientError):
                 wait = classified.retry_after or compute_wait(
-                    attempt, retry_config.strategy,
+                    attempt,
+                    retry_config.strategy,
                 )
                 logger.warning(
                     "Transient error (attempt %d/%d): %s. Retrying in %.1fs",
-                    attempt + 1, retry_config.max_attempts, classified.error_type, wait,
+                    attempt + 1,
+                    retry_config.max_attempts,
+                    classified.error_type,
+                    wait,
                 )
                 last_error = classified
                 await asyncio.sleep(wait)
                 continue
 
-            if isinstance(classified, TerminalError) and classified.recoverable_with_fallback:
-                if fallback_chain and not fallback_chain.exhausted:
-                    try:
-                        next_model = fallback_chain.next_model()
-                        kwargs["model"] = next_model
-                        logger.info("Trying fallback model: %s", next_model)
-                        continue
-                    except TerminalError:
-                        raise classified from exc
+            if (
+                isinstance(classified, TerminalError)
+                and classified.recoverable_with_fallback
+                and fallback_chain
+                and not fallback_chain.exhausted
+            ):
+                try:
+                    next_model = fallback_chain.next_model()
+                    kwargs["model"] = next_model
+                    logger.info("Trying fallback model: %s", next_model)
+                    continue
+                except TerminalError:
+                    raise classified from exc
 
             # Terminal or unrecoverable — raise
             raise classified from exc if isinstance(classified, Doc2MdError) else exc

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from doc2md.types import ConfidenceLevel
 
-
 # Map VLM self-assessment levels to numeric scores
 _LEVEL_SCORES: dict[ConfidenceLevel, float] = {
     ConfidenceLevel.HIGH: 0.90,

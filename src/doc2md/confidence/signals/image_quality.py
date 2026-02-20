@@ -100,8 +100,10 @@ def _estimate_blur(pixels: Any) -> float:
 
     # Compute Laplacian (second-order differences)
     laplacian = (
-        pixels[:-2, 1:-1] + pixels[2:, 1:-1]
-        + pixels[1:-1, :-2] + pixels[1:-1, 2:]
+        pixels[:-2, 1:-1]
+        + pixels[2:, 1:-1]
+        + pixels[1:-1, :-2]
+        + pixels[1:-1, 2:]
         - 4 * pixels[1:-1, 1:-1]
     )
     variance = float(np.var(laplacian))

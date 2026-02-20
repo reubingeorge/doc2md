@@ -115,7 +115,8 @@ class TestDiskCache:
         cache = DiskCache(db_path=tmp_path / "cache.db")
         try:
             entry = _entry(
-                "k1", "md",
+                "k1",
+                "md",
                 token_usage=TokenUsage(prompt_tokens=100, completion_tokens=50, total_tokens=150),
                 model_used="gpt-4.1",
             )

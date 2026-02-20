@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from doc2md.blackboard.board import Blackboard
 from doc2md.config.schema import StepConfig, StepType
@@ -19,9 +20,11 @@ _CODE_STEP_REGISTRY: dict[str, Callable[..., str]] = {}
 
 def register_code_step(name: str) -> Callable:
     """Decorator to register a code step function."""
+
     def decorator(fn: Callable[..., str]) -> Callable[..., str]:
         _CODE_STEP_REGISTRY[name] = fn
         return fn
+
     return decorator
 
 
@@ -41,22 +44,39 @@ async def execute_step(
     """Execute a single pipeline step, dispatching by type."""
     if step_config.type == StepType.AGENT:
         return await _execute_agent_step(
-            step_config, step_input, blackboard, agent_engine, agent_configs,
-            cache_manager=cache_manager, pipeline_name=pipeline_name,
+            step_config,
+            step_input,
+            blackboard,
+            agent_engine,
+            agent_configs,
+            cache_manager=cache_manager,
+            pipeline_name=pipeline_name,
         )
     elif step_config.type == StepType.CODE:
         return _execute_code_step(step_config, step_input)
     elif step_config.type == StepType.PARALLEL:
         from doc2md.pipeline.parallel_executor import execute_parallel
+
         return await execute_parallel(
-            step_config, step_input, blackboard, agent_engine, agent_configs,
-            cache_manager=cache_manager, pipeline_name=pipeline_name,
+            step_config,
+            step_input,
+            blackboard,
+            agent_engine,
+            agent_configs,
+            cache_manager=cache_manager,
+            pipeline_name=pipeline_name,
         )
     elif step_config.type == StepType.PAGE_ROUTE:
         from doc2md.pipeline.page_router import execute_page_route
+
         return await execute_page_route(
-            step_config, step_input, blackboard, agent_engine, agent_configs,
-            cache_manager=cache_manager, pipeline_name=pipeline_name,
+            step_config,
+            step_input,
+            blackboard,
+            agent_engine,
+            agent_configs,
+            cache_manager=cache_manager,
+            pipeline_name=pipeline_name,
         )
     else:
         raise ValueError(f"Unknown step type: {step_config.type}")

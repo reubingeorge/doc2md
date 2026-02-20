@@ -52,11 +52,7 @@ class TestModelAllowlist:
     def test_custom_models_yaml(self, tmp_path):
         yaml_path = tmp_path / "custom.yaml"
         yaml_path.write_text(
-            "models:\n"
-            "  test-model:\n"
-            "    tier: custom\n"
-            "    priority: 1\n"
-            "    logprobs: false\n"
+            "models:\n  test-model:\n    tier: custom\n    priority: 1\n    logprobs: false\n"
         )
         al = ModelAllowlist(models_path=yaml_path)
         assert al.is_allowed("test-model")

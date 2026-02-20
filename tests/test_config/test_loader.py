@@ -35,7 +35,7 @@ class TestLoadAgentYaml:
     def test_missing_required_fields(self, tmp_path):
         path = tmp_path / "incomplete.yaml"
         path.write_text("agent:\n  name: x\n")
-        with pytest.raises(Exception):  # Pydantic validation
+        with pytest.raises((ValueError, KeyError)):  # Pydantic validation
             load_agent_yaml(path)
 
     def test_full_agent_config(self, tmp_path):

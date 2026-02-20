@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import copy
 import logging
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from doc2md.blackboard.events import BlackboardEvent, EventLog, EventType
 from doc2md.blackboard.regions import (
+    VALID_REGIONS,
     DocumentMetadata,
     PageObservation,
-    VALID_REGIONS,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,8 +28,8 @@ class BlackboardView:
             return super().__getattribute__(name)
         try:
             return self._data[name]
-        except KeyError:
-            raise AttributeError(f"BlackboardView has no region '{name}'")
+        except KeyError as err:
+            raise AttributeError(f"BlackboardView has no region '{name}'") from err
 
     def to_dict(self) -> dict[str, Any]:
         return copy.deepcopy(self._data)
@@ -55,25 +56,29 @@ class Blackboard:
         """Read a value from a region. Logs a READ event."""
         self._validate_region(region)
         value = self._get_value(region, key)
-        self._event_log.append(BlackboardEvent(
-            event_type=EventType.READ,
-            region=region,
-            key=key,
-            agent_name=reader,
-        ))
+        self._event_log.append(
+            BlackboardEvent(
+                event_type=EventType.READ,
+                region=region,
+                key=key,
+                agent_name=reader,
+            )
+        )
         return value
 
     def write(self, region: str, key: str, value: Any, writer: str = "") -> None:
         """Write a value to a region. Validates and logs a WRITE event."""
         self._validate_region(region)
         self._set_value(region, key, value)
-        self._event_log.append(BlackboardEvent(
-            event_type=EventType.WRITE,
-            region=region,
-            key=key,
-            value=value,
-            agent_name=writer,
-        ))
+        self._event_log.append(
+            BlackboardEvent(
+                event_type=EventType.WRITE,
+                region=region,
+                key=key,
+                value=value,
+                agent_name=writer,
+            )
+        )
 
     def query(self, region: str, filter_fn: Callable[[Any], bool]) -> list[Any]:
         """Query a region with a filter function."""
@@ -82,11 +87,7 @@ class Blackboard:
         if isinstance(store, dict):
             return [v for v in store.values() if filter_fn(v)]
         # For DocumentMetadata, filter against fields
-        return [
-            getattr(store, f)
-            for f in store.model_fields
-            if filter_fn(getattr(store, f))
-        ]
+        return [getattr(store, f) for f in store.model_fields if filter_fn(getattr(store, f))]
 
     def subscribe(self, regions: list[str]) -> BlackboardView:
         """Return a read-only view of specific regions for prompt injection."""
@@ -101,9 +102,7 @@ class Blackboard:
         """Frozen snapshot for cache key computation."""
         return {
             "document_metadata": self.document_metadata.model_dump(),
-            "page_observations": {
-                k: v.model_dump() for k, v in self.page_observations.items()
-            },
+            "page_observations": {k: v.model_dump() for k, v in self.page_observations.items()},
             "step_outputs": dict(self.step_outputs),
             "agent_notes": copy.deepcopy(self.agent_notes),
             "confidence_signals": copy.deepcopy(self.confidence_signals),
@@ -164,7 +163,9 @@ class Blackboard:
                 if old is not None and old != value:
                     logger.warning(
                         "Blackboard conflict: document_metadata.%s changing from %r to %r",
-                        key, old, value,
+                        key,
+                        old,
+                        value,
                     )
             setattr(self.document_metadata, key, value)
 
@@ -205,8 +206,5 @@ class Blackboard:
         if isinstance(store, DocumentMetadata):
             return store.model_dump(exclude_none=True)
         if region == "page_observations":
-            return {
-                k: v.model_dump(exclude_none=True)
-                for k, v in store.items()
-            }
+            return {k: v.model_dump(exclude_none=True) for k, v in store.items()}
         return copy.deepcopy(store)

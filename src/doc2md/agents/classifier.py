@@ -67,15 +67,18 @@ async def classify_document(
     if result.confidence < _CONFIDENCE_THRESHOLD:
         logger.info(
             "Low classification confidence (%.2f). Using '%s'.",
-            result.confidence, _FALLBACK_PIPELINE,
+            result.confidence,
+            _FALLBACK_PIPELINE,
         )
         result.pipeline_name = _FALLBACK_PIPELINE
 
     # Write content types to blackboard
     if blackboard and result.content_types_detected:
         blackboard.write(
-            "document_metadata", "content_types",
-            result.content_types_detected, writer="_classifier",
+            "document_metadata",
+            "content_types",
+            result.content_types_detected,
+            writer="_classifier",
         )
 
     return result
@@ -87,7 +90,9 @@ def _build_classification_prompt(pipeline_registry: PipelineRegistry) -> str:
     for info in pipeline_registry.list_pipelines():
         pipelines_desc.append(f'- "{info.name}": {info.description}')
 
-    pipeline_list = "\n".join(pipelines_desc) if pipelines_desc else '- "generic": General-purpose extraction'
+    pipeline_list = (
+        "\n".join(pipelines_desc) if pipelines_desc else '- "generic": General-purpose extraction'
+    )
 
     return f"""You are a document classifier. Given the first page of a document, classify it into the best matching pipeline type.
 

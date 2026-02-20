@@ -10,7 +10,10 @@ def _custom_allowlist(*model_tuples: tuple) -> ModelAllowlist:
     allowlist._models = {}
     for name, tier, priority, logprobs in model_tuples:
         allowlist._models[name] = ModelInfo(
-            name=name, tier=tier, priority=priority, logprobs=logprobs,
+            name=name,
+            tier=tier,
+            priority=priority,
+            logprobs=logprobs,
         )
     return allowlist
 

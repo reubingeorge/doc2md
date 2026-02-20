@@ -25,8 +25,10 @@ class TestExceptionHierarchy:
 class TestTransientError:
     def test_attributes(self):
         err = TransientError(
-            "Rate limited", error_type="rate_limit",
-            http_status=429, retry_after=5.0,
+            "Rate limited",
+            error_type="rate_limit",
+            http_status=429,
+            retry_after=5.0,
         )
         assert err.error_type == "rate_limit"
         assert err.http_status == 429
@@ -43,7 +45,8 @@ class TestTransientError:
 class TestRecoverableError:
     def test_attributes(self):
         err = RecoverableError(
-            "Low quality", error_type="low_confidence",
+            "Low quality",
+            error_type="low_confidence",
             suggestion="upscale image",
         )
         assert err.error_type == "low_confidence"
@@ -53,8 +56,10 @@ class TestRecoverableError:
 class TestTerminalError:
     def test_attributes(self):
         err = TerminalError(
-            "Not found", error_type="model_not_found",
-            http_status=404, recoverable_with_fallback=True,
+            "Not found",
+            error_type="model_not_found",
+            http_status=404,
+            recoverable_with_fallback=True,
         )
         assert err.error_type == "model_not_found"
         assert err.http_status == 404

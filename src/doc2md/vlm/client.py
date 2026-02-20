@@ -15,7 +15,7 @@ from tenacity import (
 
 from doc2md.errors.exceptions import TerminalError
 from doc2md.errors.fallback import FallbackChain
-from doc2md.types import RetryConfig, TokenUsage, VLMResponse
+from doc2md.types import TokenUsage, VLMResponse
 
 if TYPE_CHECKING:
     from doc2md.concurrency.rate_limiter import RateLimiter
@@ -124,22 +124,22 @@ class AsyncVLMClient:
         await self._client.close()
 
     @staticmethod
-    def _build_messages(
-        system_prompt: str, user_prompt: str, image_b64: str | None
-    ) -> list[dict]:
+    def _build_messages(system_prompt: str, user_prompt: str, image_b64: str | None) -> list[dict]:
         messages: list[dict] = [{"role": "system", "content": system_prompt}]
 
         if image_b64:
-            messages.append({
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": user_prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/png;base64,{image_b64}"},
-                    },
-                ],
-            })
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/png;base64,{image_b64}"},
+                        },
+                    ],
+                }
+            )
         else:
             messages.append({"role": "user", "content": user_prompt})
 
@@ -153,8 +153,7 @@ class AsyncVLMClient:
         token_logprobs = None
         if choice.logprobs and choice.logprobs.content:
             token_logprobs = [
-                {"token": lp.token, "logprob": lp.logprob}
-                for lp in choice.logprobs.content
+                {"token": lp.token, "logprob": lp.logprob} for lp in choice.logprobs.content
             ]
 
         return VLMResponse(

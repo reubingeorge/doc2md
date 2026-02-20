@@ -3,7 +3,6 @@
 import pytest
 
 from doc2md.blackboard.board import Blackboard, BlackboardView
-from doc2md.blackboard.regions import PageObservation
 
 
 class TestBlackboardReadWrite:

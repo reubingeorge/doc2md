@@ -1,6 +1,6 @@
 """Tests for cache key generation."""
 
-from doc2md.cache.keys import generate_cache_key, hash_image, hash_prompt, _hash_dict
+from doc2md.cache.keys import generate_cache_key, hash_image, hash_prompt
 
 
 class TestHashImage:
@@ -81,13 +81,18 @@ class TestGenerateCacheKey:
         )
         snap1 = {"a": 1, "b": 2}
         snap2 = {"b": 2, "a": 1}
-        assert generate_cache_key(**base, blackboard_snapshot=snap1) == \
-               generate_cache_key(**base, blackboard_snapshot=snap2)
+        assert generate_cache_key(**base, blackboard_snapshot=snap1) == generate_cache_key(
+            **base, blackboard_snapshot=snap2
+        )
 
     def test_returns_hex_string(self):
         k = generate_cache_key(
-            image_hash="x", pipeline_name="p", step_name="s",
-            agent_name="a", agent_version="1", model_id="m",
+            image_hash="x",
+            pipeline_name="p",
+            step_name="s",
+            agent_name="a",
+            agent_version="1",
+            model_id="m",
             prompt_hash="ph",
         )
         assert len(k) == 64

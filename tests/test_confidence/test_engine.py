@@ -10,7 +10,6 @@ from doc2md.types import (
     StepResult,
     TokenUsage,
     ValidationRule,
-    VLMResponse,
 )
 
 

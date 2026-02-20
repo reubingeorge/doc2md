@@ -19,7 +19,7 @@ class TestNormalizeHeadings:
     def test_blank_lines_around_heading(self):
         result = normalize_headings("text\n# Heading\nmore text")
         lines = result.split("\n")
-        heading_idx = next(i for i, l in enumerate(lines) if l.strip().startswith("# "))
+        heading_idx = next(i for i, line in enumerate(lines) if line.strip().startswith("# "))
         # Blank line before heading
         assert lines[heading_idx - 1].strip() == ""
         # Blank line after heading
@@ -42,7 +42,7 @@ class TestFixTableAlignment:
         result = fix_table_alignment(table)
         lines = result.strip().split("\n")
         # All rows should have same number of | characters
-        pipe_counts = [l.count("|") for l in lines]
+        pipe_counts = [line.count("|") for line in lines]
         assert len(set(pipe_counts)) == 1
 
     def test_preserves_non_table_content(self):

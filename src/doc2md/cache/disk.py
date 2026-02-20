@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import sqlite3
@@ -33,9 +34,7 @@ class DiskCache:
         self._create_table()
 
     def get(self, key: str) -> CacheEntry | None:
-        row = self._conn.execute(
-            "SELECT * FROM cache WHERE key = ?", (key,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM cache WHERE key = ?", (key,)).fetchone()
         if row is None:
             return None
         entry = self._row_to_entry(row)
@@ -62,15 +61,22 @@ class DiskCache:
                 model_used, size_bytes)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
-                key, entry.created_at, entry.ttl_seconds, time.time(),
-                entry.pipeline_name, entry.step_name, entry.agent_name,
-                entry.agent_version, entry.markdown,
+                key,
+                entry.created_at,
+                entry.ttl_seconds,
+                time.time(),
+                entry.pipeline_name,
+                entry.step_name,
+                entry.agent_name,
+                entry.agent_version,
+                entry.markdown,
                 json.dumps(entry.blackboard_writes),
                 entry.confidence,
                 entry.token_usage.prompt_tokens,
                 entry.token_usage.completion_tokens,
                 entry.token_usage.total_tokens,
-                entry.model_used, entry.size_bytes,
+                entry.model_used,
+                entry.size_bytes,
             ),
         )
         self._conn.commit()
@@ -151,9 +157,7 @@ class DiskCache:
 
         # Then LRU evict if still over limit
         while True:
-            row = self._conn.execute(
-                "SELECT COALESCE(SUM(size_bytes), 0) FROM cache"
-            ).fetchone()
+            row = self._conn.execute("SELECT COALESCE(SUM(size_bytes), 0) FROM cache").fetchone()
             current_size = row[0]
             if current_size + new_entry_size <= self._max_size_bytes:
                 break
@@ -169,10 +173,8 @@ class DiskCache:
     @staticmethod
     def _row_to_entry(row: sqlite3.Row) -> CacheEntry:
         bb_writes = {}
-        try:
+        with contextlib.suppress(json.JSONDecodeError, TypeError):
             bb_writes = json.loads(row["blackboard_writes"]) if row["blackboard_writes"] else {}
-        except (json.JSONDecodeError, TypeError):
-            pass
 
         return CacheEntry(
             key=row["key"],

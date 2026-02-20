@@ -2,7 +2,7 @@
 
 import pytest
 
-from doc2md.config.schema import PipelineConfig, StepConfig, StepType
+from doc2md.config.schema import PipelineConfig, StepConfig
 from doc2md.pipeline.graph import CycleError, StepGraph, parse_pipeline
 
 

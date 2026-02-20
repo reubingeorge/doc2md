@@ -39,9 +39,18 @@ class TestDefaults:
     def test_get_defaults_has_all_keys(self):
         d = get_defaults()
         expected_keys = {
-            "model", "classifier_model", "max_tokens", "temperature",
-            "cache_memory_mb", "cache_disk_mb", "cache_disabled",
-            "max_workers", "rpm_limit", "tpm_limit",
-            "max_retries", "retry_strategy", "log_level",
+            "model",
+            "classifier_model",
+            "max_tokens",
+            "temperature",
+            "cache_memory_mb",
+            "cache_disk_mb",
+            "cache_disabled",
+            "max_workers",
+            "rpm_limit",
+            "tpm_limit",
+            "max_retries",
+            "retry_strategy",
+            "log_level",
         }
         assert expected_keys == set(d.keys())

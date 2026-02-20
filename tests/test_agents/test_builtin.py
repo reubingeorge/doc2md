@@ -1,20 +1,30 @@
 """Tests that all built-in agent and pipeline YAMLs load and validate."""
 
-from pathlib import Path
-
 import pytest
 
 from doc2md.agents.registry import AgentRegistry, PipelineRegistry
 
 _EXPECTED_AGENTS = [
-    "_classifier", "_page_classifier", "generic", "text_extract",
-    "table_extract", "handwriting", "metadata_extract", "summarize",
-    "validator", "document_merger",
+    "_classifier",
+    "_page_classifier",
+    "generic",
+    "text_extract",
+    "table_extract",
+    "handwriting",
+    "metadata_extract",
+    "summarize",
+    "validator",
+    "document_merger",
 ]
 
 _EXPECTED_PIPELINES = [
-    "generic", "receipt", "structured_pdf", "academic",
-    "legal_contract", "handwritten", "mixed_document",
+    "generic",
+    "receipt",
+    "structured_pdf",
+    "academic",
+    "legal_contract",
+    "handwritten",
+    "mixed_document",
 ]
 
 
@@ -29,7 +39,7 @@ class TestBuiltinAgents:
         config = registry.get(agent_name)
         assert config.name == agent_name
         assert config.prompt.system  # Has a system prompt
-        assert config.prompt.user    # Has a user prompt
+        assert config.prompt.user  # Has a user prompt
         assert config.model.preferred  # Has a model set
 
     def test_all_expected_agents_present(self, registry):

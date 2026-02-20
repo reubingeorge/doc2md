@@ -23,9 +23,7 @@ class TestConvertIntegration:
 
         converter = Doc2Md(api_key="test-key", no_cache=True)
 
-        with patch.object(
-            converter, "_get_vlm_client"
-        ) as mock_get_client:
+        with patch.object(converter, "_get_vlm_client") as mock_get_client:
             mock_client = AsyncMock()
             mock_client.send_request = AsyncMock(return_value=_mock_vlm_response())
             mock_get_client.return_value = mock_client
@@ -80,7 +78,7 @@ agent:
             mock_client.send_request = AsyncMock(return_value=_mock_vlm_response())
             mock_get_client.return_value = mock_client
 
-            result = await converter.convert_async(img_path, model="gpt-4.1")
+            await converter.convert_async(img_path, model="gpt-4.1")
 
         call_kwargs = mock_client.send_request.call_args.kwargs
         assert call_kwargs["model"] == "gpt-4.1"

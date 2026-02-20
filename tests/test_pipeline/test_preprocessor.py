@@ -9,8 +9,8 @@ from doc2md.pipeline.preprocessor import (
     binarize,
     compute_quality,
     crop_margins,
-    deskew,
     denoise,
+    deskew,
     enhance_contrast,
     resize,
     run_preprocessing,
@@ -48,7 +48,7 @@ class TestEnhanceContrast:
         original = _make_image()
         enhanced = enhance_contrast(original, factor=2.0)
         # Different factor should produce different bytes
-        assert enhanced != original or True  # Uniform images may not change much
+        assert len(enhanced) > 0  # Uniform images may not change much
 
     def test_default_factor(self):
         result = enhance_contrast(_make_image())

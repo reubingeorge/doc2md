@@ -50,7 +50,8 @@ class MemoryCache:
     ) -> int:
         """Remove entries matching the given filters. Returns count deleted."""
         to_remove = [
-            key for key, entry in self._store.items()
+            key
+            for key, entry in self._store.items()
             if _matches_filter(entry, pipeline, agent, step)
         ]
         for key in to_remove:
@@ -89,6 +90,4 @@ def _matches_filter(
         return False
     if agent and entry.agent_name != agent:
         return False
-    if step and entry.step_name != step:
-        return False
-    return True
+    return not (step and entry.step_name != step)

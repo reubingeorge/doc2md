@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ── Enums ──
 
 
-class InputMode(str, Enum):
+class InputMode(StrEnum):
     IMAGE = "image"
     PREVIOUS_OUTPUT = "previous_output"
     IMAGE_AND_PREVIOUS = "image_and_previous"
@@ -19,19 +18,19 @@ class InputMode(str, Enum):
     PREVIOUS_OUTPUT_ONLY = "previous_output_only"
 
 
-class RetryStrategy(str, Enum):
+class RetryStrategy(StrEnum):
     EXPONENTIAL = "exponential"
     LINEAR = "linear"
     FIXED = "fixed"
 
 
-class WritesVia(str, Enum):
+class WritesVia(StrEnum):
     PROMPT_ELICITED = "prompt_elicited"
     CODE_COMPUTED = "code_computed"
     HYBRID = "hybrid"
 
 
-class ConfidenceLevel(str, Enum):
+class ConfidenceLevel(StrEnum):
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
     LOW = "LOW"

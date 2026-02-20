@@ -1,6 +1,6 @@
 """Tests for calibration curves."""
 
-from doc2md.confidence.calibration import calibrate, _manual_calibrate
+from doc2md.confidence.calibration import _manual_calibrate, calibrate
 
 
 class TestCalibrate:

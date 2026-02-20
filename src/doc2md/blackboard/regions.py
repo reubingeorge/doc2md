@@ -44,9 +44,9 @@ class DocumentMetadata(BaseModel):
 REGION_TYPES: dict[str, type] = {
     "document_metadata": DocumentMetadata,
     "page_observations": dict,  # Dict[int, PageObservation]
-    "step_outputs": dict,       # Dict[str, str]
-    "agent_notes": dict,        # Dict[str, Dict[str, Any]]
-    "confidence_signals": dict, # Dict[str, Dict[str, Any]]
+    "step_outputs": dict,  # Dict[str, str]
+    "agent_notes": dict,  # Dict[str, Dict[str, Any]]
+    "confidence_signals": dict,  # Dict[str, Dict[str, Any]]
 }
 
 VALID_REGIONS = frozenset(REGION_TYPES.keys())

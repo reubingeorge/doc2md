@@ -24,10 +24,9 @@ def compute_completeness(
 
     for field in expected_fields:
         # Check as substring (case-insensitive)
-        if field.lower() in lower_md:
-            found.append(field)
-        # Also check as a markdown header variant
-        elif re.search(rf"#{1,6}\s+.*{re.escape(field)}", markdown, re.IGNORECASE):
+        if field.lower() in lower_md or re.search(
+            rf"#{1, 6}\s+.*{re.escape(field)}", markdown, re.IGNORECASE
+        ):
             found.append(field)
         else:
             missing.append(field)

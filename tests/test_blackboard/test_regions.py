@@ -1,13 +1,10 @@
 """Tests for blackboard region Pydantic models."""
 
-import pytest
-from pydantic import ValidationError
-
 from doc2md.blackboard.regions import (
+    VALID_REGIONS,
     DocumentMetadata,
     PageObservation,
     UncertainRegion,
-    VALID_REGIONS,
 )
 
 
@@ -63,7 +60,10 @@ class TestValidRegions:
     def test_has_all_five(self):
         assert len(VALID_REGIONS) == 5
         expected = {
-            "document_metadata", "page_observations", "step_outputs",
-            "agent_notes", "confidence_signals",
+            "document_metadata",
+            "page_observations",
+            "step_outputs",
+            "agent_notes",
+            "confidence_signals",
         }
-        assert VALID_REGIONS == expected
+        assert expected == VALID_REGIONS

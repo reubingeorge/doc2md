@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
+from jinja2 import ChainableUndefined
 from jinja2.sandbox import SandboxedEnvironment
 
 from doc2md.types import AgentConfig
-
-from jinja2 import ChainableUndefined
 
 _jinja_env = SandboxedEnvironment(
     autoescape=False,

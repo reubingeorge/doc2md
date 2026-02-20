@@ -78,9 +78,9 @@ def _strip_artifacts(markdown: str) -> str:
     """Remove common VLM output artifacts."""
     # Strip leading/trailing code fences that wrap entire output
     if markdown.startswith("```markdown"):
-        markdown = markdown[len("```markdown"):]
+        markdown = markdown[len("```markdown") :]
     elif markdown.startswith("```md"):
-        markdown = markdown[len("```md"):]
+        markdown = markdown[len("```md") :]
     elif markdown.startswith("```"):
         markdown = markdown[3:]
 

@@ -2,10 +2,8 @@
 
 from unittest.mock import AsyncMock
 
-import pytest
-
 from doc2md.blackboard.board import Blackboard
-from doc2md.config.schema import PipelineConfig, StepConfig, StepType
+from doc2md.config.schema import PipelineConfig, StepConfig
 from doc2md.pipeline.engine import PipelineEngine
 from doc2md.types import (
     AgentConfig,
@@ -13,7 +11,6 @@ from doc2md.types import (
     PromptConfig,
     StepResult,
     TokenUsage,
-    VLMResponse,
 )
 
 
@@ -62,7 +59,8 @@ class TestPipelineEngine:
             steps=[
                 StepConfig(name="extract", agent="text_extract"),
                 StepConfig(
-                    name="validate", agent="validator",
+                    name="validate",
+                    agent="validator",
                     input=InputMode.IMAGE_AND_PREVIOUS,
                     depends_on=["extract"],
                 ),
@@ -86,7 +84,8 @@ class TestPipelineEngine:
             steps=[
                 StepConfig(name="extract", agent="generic", depends_on=[]),
                 StepConfig(
-                    name="handwriting", agent="handwriting",
+                    name="handwriting",
+                    agent="handwriting",
                     depends_on=["extract"],
                     condition="'handwriting' in bb.document_metadata.content_types",
                 ),
@@ -110,7 +109,8 @@ class TestPipelineEngine:
             steps=[
                 StepConfig(name="extract", agent="generic", depends_on=[]),
                 StepConfig(
-                    name="handwriting", agent="handwriting",
+                    name="handwriting",
+                    agent="handwriting",
                     depends_on=["extract"],
                     condition="'handwriting' in bb.document_metadata.content_types",
                 ),

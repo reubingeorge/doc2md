@@ -2,7 +2,6 @@
 
 import httpx
 import openai
-import pytest
 
 from doc2md.errors.exceptions import TerminalError, TransientError
 from doc2md.errors.retry import classify_openai_error, compute_wait
@@ -19,7 +18,9 @@ class TestClassifyOpenAIError:
     def test_rate_limit(self):
         err = classify_openai_error(
             openai.RateLimitError(
-                message="rate limit", response=_mock_response(429), body=None,
+                message="rate limit",
+                response=_mock_response(429),
+                body=None,
             )
         )
         assert isinstance(err, TransientError)
@@ -28,23 +29,25 @@ class TestClassifyOpenAIError:
     def test_internal_server(self):
         err = classify_openai_error(
             openai.InternalServerError(
-                message="server err", response=_mock_response(500), body=None,
+                message="server err",
+                response=_mock_response(500),
+                body=None,
             )
         )
         assert isinstance(err, TransientError)
         assert err.error_type == "server_error"
 
     def test_connection_error(self):
-        err = classify_openai_error(
-            openai.APIConnectionError(request=None)
-        )
+        err = classify_openai_error(openai.APIConnectionError(request=None))
         assert isinstance(err, TransientError)
         assert err.error_type == "timeout"
 
     def test_auth_error(self):
         err = classify_openai_error(
             openai.AuthenticationError(
-                message="bad key", response=_mock_response(401), body=None,
+                message="bad key",
+                response=_mock_response(401),
+                body=None,
             )
         )
         assert isinstance(err, TerminalError)
@@ -54,7 +57,9 @@ class TestClassifyOpenAIError:
     def test_not_found(self):
         err = classify_openai_error(
             openai.NotFoundError(
-                message="model not found", response=_mock_response(404), body=None,
+                message="model not found",
+                response=_mock_response(404),
+                body=None,
             )
         )
         assert isinstance(err, TerminalError)
@@ -64,7 +69,9 @@ class TestClassifyOpenAIError:
     def test_bad_request(self):
         err = classify_openai_error(
             openai.BadRequestError(
-                message="bad input", response=_mock_response(400), body=None,
+                message="bad input",
+                response=_mock_response(400),
+                body=None,
             )
         )
         assert isinstance(err, TerminalError)

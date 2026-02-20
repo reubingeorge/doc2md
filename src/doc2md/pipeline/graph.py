@@ -52,9 +52,7 @@ class StepGraph:
                 # Explicit dependencies
                 for dep in step.depends_on:
                     if dep not in self._steps:
-                        raise ValueError(
-                            f"Step '{step.name}' depends on unknown step '{dep}'"
-                        )
+                        raise ValueError(f"Step '{step.name}' depends on unknown step '{dep}'")
                     self._edges[step.name].append(dep)
             elif i > 0:
                 # Implicit: depends on previous step in list

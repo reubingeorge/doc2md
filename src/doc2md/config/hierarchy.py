@@ -136,7 +136,9 @@ def _coerce_env_value(key: str, value: str) -> Any:
         try:
             return target_type(value)
         except (ValueError, TypeError):
-            logger.warning("Cannot convert env var for '%s' to %s: %s", key, target_type.__name__, value)
+            logger.warning(
+                "Cannot convert env var for '%s' to %s: %s", key, target_type.__name__, value
+            )
             return value
 
     return value

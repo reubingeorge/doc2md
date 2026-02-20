@@ -1,6 +1,6 @@
 """Tests for signal combiner with adaptive weight redistribution."""
 
-from doc2md.confidence.combiner import SignalResult, combine_signals, _redistribute_weights
+from doc2md.confidence.combiner import SignalResult, _redistribute_weights, combine_signals
 
 
 class TestCombineSignals:
@@ -56,16 +56,12 @@ class TestCombineSignals:
 
 class TestRedistributeWeights:
     def test_all_available(self):
-        result = _redistribute_weights(
-            {"a": 0.5, "b": 0.5}, {"a", "b"}
-        )
+        result = _redistribute_weights({"a": 0.5, "b": 0.5}, {"a", "b"})
         assert abs(result["a"] - 0.5) < 0.01
         assert abs(result["b"] - 0.5) < 0.01
 
     def test_one_removed(self):
-        result = _redistribute_weights(
-            {"a": 0.25, "b": 0.25, "c": 0.50}, {"a", "c"}
-        )
+        result = _redistribute_weights({"a": 0.25, "b": 0.25, "c": 0.50}, {"a", "c"})
         # a: 0.25/0.75 = 0.333, c: 0.50/0.75 = 0.667
         assert abs(result["a"] - 0.333) < 0.01
         assert abs(result["c"] - 0.667) < 0.01
