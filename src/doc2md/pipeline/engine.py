@@ -141,6 +141,11 @@ class PipelineEngine:
                         )
 
             step_results[step_name] = result
+            logger.info(
+                "Step '%s' complete — confidence=%.2f",
+                step_name,
+                result.confidence if result.confidence else 0.0,
+            )
 
         # Aggregate pipeline-level confidence
         confidence_report = None

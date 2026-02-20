@@ -41,6 +41,10 @@ class AgentEngine:
         """Execute an agent and return the step result."""
         resolved_step = step_name or agent_config.name
 
+        logger.info(
+            "Agent '%s' starting (model=%s)", agent_config.name, agent_config.model.preferred
+        )
+
         # Run image preprocessing if configured
         if image_bytes and agent_config.preprocessing:
             image_bytes, quality = run_preprocessing(image_bytes, agent_config.preprocessing)
@@ -83,6 +87,7 @@ class AgentEngine:
                 )
             return cached_result
 
+        logger.info("Calling VLM '%s' for step '%s'", agent_config.model.preferred, resolved_step)
         vlm_response = await self._vlm.send_request(
             model=agent_config.model.preferred,
             system_prompt=system_prompt,
@@ -106,6 +111,15 @@ class AgentEngine:
         # Run code-computed writers
         if blackboard:
             self._run_code_writers(agent_config, blackboard, markdown, resolved_step, page_num)
+
+        logger.info(
+            "Agent '%s' done — %d chars, %d tokens (prompt=%d, completion=%d)",
+            agent_config.name,
+            len(markdown),
+            vlm_response.token_usage.total_tokens,
+            vlm_response.token_usage.prompt_tokens,
+            vlm_response.token_usage.completion_tokens,
+        )
 
         result = StepResult(
             step_name=resolved_step,

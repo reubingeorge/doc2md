@@ -64,6 +64,9 @@ class AsyncVLMClient:
         if self._rate_limiter:
             await self._rate_limiter.acquire(estimated_tokens=max_tokens)
 
+        logger.debug(
+            "VLM request: model=%s, max_tokens=%d, image=%s", model, max_tokens, bool(image_b64)
+        )
         messages = self._build_messages(system_prompt, user_prompt, image_b64)
 
         kwargs: dict = {

@@ -90,7 +90,9 @@ class Doc2Md:
     ) -> ConversionResult:
         """Convert a document to markdown asynchronously."""
         input_path = Path(input_path)
+        logger.info("Converting '%s'", input_path.name)
         page_images = self._load_pages(input_path)
+        logger.info("Loaded %d page(s)", len(page_images))
         vlm_client = self._get_vlm_client()
         agent_engine = AgentEngine(vlm_client)
         blackboard = Blackboard()
@@ -107,6 +109,9 @@ class Doc2Md:
         )
 
         # Execute pipeline
+        logger.info(
+            "Using pipeline '%s' (%d steps)", pipeline_config.name, len(pipeline_config.steps)
+        )
         pipeline_engine = PipelineEngine(
             agent_engine,
             agent_configs,
@@ -116,6 +121,12 @@ class Doc2Md:
 
         # Build conversion result with confidence data
         conf_report = result.confidence_report
+        logger.info(
+            "Done. %d pages, confidence=%.2f, tokens=%d",
+            len(page_images),
+            conf_report.overall if conf_report else 0.0,
+            result.token_usage.total_tokens,
+        )
         return ConversionResult(
             markdown=result.markdown,
             classified_as=result.pipeline_name,
