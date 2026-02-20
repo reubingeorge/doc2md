@@ -267,13 +267,24 @@ class AgentEngine:
         writes: dict[str, Any],
         writer: str,
     ) -> None:
-        """Write VLM-elicited data to the blackboard."""
+        """Write VLM-elicited data to the blackboard.
+
+        Keys that match a valid region (e.g. 'agent_notes') are written
+        as region.subkey. Unknown keys are written under 'agent_notes'
+        as a fallback to prevent crashes from unexpected VLM output.
+        """
+        from doc2md.blackboard.regions import VALID_REGIONS
+
         for region, data in writes.items():
-            if isinstance(data, dict):
-                for key, value in data.items():
-                    blackboard.write(region, str(key), value, writer=writer)
+            if region in VALID_REGIONS:
+                if isinstance(data, dict):
+                    for key, value in data.items():
+                        blackboard.write(region, str(key), value, writer=writer)
+                else:
+                    blackboard.write(region, region, data, writer=writer)
             else:
-                blackboard.write(region, region, data, writer=writer)
+                # Unknown key — write under agent_notes as fallback
+                blackboard.write("agent_notes", region, data, writer=writer)
 
     @staticmethod
     def _run_code_writers(

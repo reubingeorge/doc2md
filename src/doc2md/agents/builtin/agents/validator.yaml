@@ -31,8 +31,9 @@ agent:
 
       Then, put your validation notes inside a blackboard block:
       <blackboard>
-      validation_issues: "list of issues found, or 'none'"
-      corrections_made: "list of corrections, or 'none'"
+      agent_notes:
+        validation_issues: "list of issues found, or 'none'"
+        corrections_made: "list of corrections, or 'none'"
       </blackboard>
 
       Finally, on the very last line add exactly one of: [confidence: HIGH], [confidence: MEDIUM], or [confidence: LOW]

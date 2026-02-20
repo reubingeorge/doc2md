@@ -27,10 +27,11 @@ agent:
 
       If any regions are hard to read or uncertain, note them in a blackboard block at the end:
       <blackboard>
-      uncertain_regions:
-        - area: "description of area"
-          reason: "why it's uncertain"
-      notes: "any observations about the text"
+      agent_notes:
+        uncertain_regions:
+          - area: "description of area"
+            reason: "why it's uncertain"
+        notes: "any observations about the text"
       </blackboard>
       {% if bb.document_metadata.language %}
       Document language: {{ bb.document_metadata.language }}. Extract in this language.
