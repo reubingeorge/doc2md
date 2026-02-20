@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 from typing import NamedTuple
 
+import yaml
+
 from doc2md.config.loader import load_agent_yaml, load_pipeline_yaml
 from doc2md.config.schema import PipelineConfig
 from doc2md.types import AgentConfig
@@ -72,6 +74,10 @@ class AgentRegistry:
             return
         for path in sorted(directory.glob("*.yaml")):
             try:
+                with open(path) as f:
+                    raw = yaml.safe_load(f)
+                if not isinstance(raw, dict) or "agent" not in raw:
+                    continue  # Not an agent YAML, skip silently
                 config = load_agent_yaml(path)
                 # User agents override builtins
                 if config.name not in self._agents or not builtin:
@@ -120,6 +126,10 @@ class PipelineRegistry:
             return
         for path in sorted(directory.glob("*.yaml")):
             try:
+                with open(path) as f:
+                    raw = yaml.safe_load(f)
+                if not isinstance(raw, dict) or "pipeline" not in raw:
+                    continue  # Not a pipeline YAML, skip silently
                 config = load_pipeline_yaml(path)
                 if config.name not in self._pipelines or not builtin:
                     self._pipelines[config.name] = config

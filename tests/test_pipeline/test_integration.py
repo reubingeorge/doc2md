@@ -45,8 +45,7 @@ pipeline:
 
         converter = Doc2Md(
             api_key="test-key",
-            config_dir=str(tmp_path),
-            pipeline_dir=str(tmp_path),
+            custom_dir=str(tmp_path),
             no_cache=True,
         )
 

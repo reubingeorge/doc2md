@@ -49,6 +49,9 @@ def cli() -> None:
 @click.option("--workers", type=int, default=None, help="Concurrent workers for batch.")
 @click.option("--no-cache", is_flag=True, default=False, help="Disable caching.")
 @click.option("--per-page", is_flag=True, default=False, help="Save each page as a separate file.")
+@click.option(
+    "--custom-dir", type=click.Path(exists=True), help="Directory with custom agent/pipeline YAMLs."
+)
 @click.option("-v", "--verbose", count=True, help="Increase verbosity (-v info, -vv debug).")
 def convert(
     input_path: str,
@@ -60,6 +63,7 @@ def convert(
     workers: int | None,
     no_cache: bool,
     per_page: bool,
+    custom_dir: str | None,
     verbose: int,
 ) -> None:
     """Convert document(s) to markdown."""
@@ -74,10 +78,21 @@ def convert(
     input_path_obj = Path(input_path)
 
     if input_path_obj.is_dir():
-        _convert_batch(input_path_obj, output_dir, pipeline, agent, model, config, no_cache)
+        _convert_batch(
+            input_path_obj, output_dir, pipeline, agent, model, config, no_cache, custom_dir
+        )
     else:
         _convert_single(
-            input_path_obj, output, pipeline, agent, model, config, no_cache, per_page, verbose
+            input_path_obj,
+            output,
+            pipeline,
+            agent,
+            model,
+            config,
+            no_cache,
+            per_page,
+            custom_dir,
+            verbose,
         )
 
 
@@ -90,6 +105,7 @@ def _convert_single(
     config: dict,
     no_cache: bool,
     per_page: bool,
+    custom_dir: str | None,
     verbose: int,
 ) -> None:
     """Convert a single file."""
@@ -102,6 +118,7 @@ def _convert_single(
         api_key=api_key,
         base_url=base_url,
         no_cache=no_cache,
+        custom_dir=custom_dir,
     )
 
     try:
@@ -138,6 +155,7 @@ def _convert_batch(
     model: str | None,
     config: dict,
     no_cache: bool,
+    custom_dir: str | None = None,
 ) -> None:
     """Convert all supported files in a directory."""
     from doc2md.core import Doc2Md
@@ -156,7 +174,7 @@ def _convert_batch(
     base_url = config.get("base_url")
     max_workers = config.get("max_workers", 5)
 
-    converter = Doc2Md(api_key=api_key, base_url=base_url, no_cache=no_cache)
+    converter = Doc2Md(api_key=api_key, base_url=base_url, no_cache=no_cache, custom_dir=custom_dir)
 
     from doc2md.concurrency.pool import ConcurrencyPool
 

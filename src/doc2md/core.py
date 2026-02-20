@@ -43,8 +43,7 @@ class Doc2Md:
         self,
         api_key: str | None = None,
         base_url: str | None = None,
-        config_dir: str | None = None,
-        pipeline_dir: str | None = None,
+        custom_dir: str | None = None,
         no_cache: bool = False,
         cache_memory_mb: float = 500,
         cache_disk_mb: float = 5000,
@@ -55,10 +54,11 @@ class Doc2Md:
         self._vlm_client: AsyncVLMClient | None = None
 
         # Build registries from builtin + user directories
-        user_agent_dirs = [Path(config_dir)] if config_dir else []
-        user_pipeline_dirs = [Path(pipeline_dir)] if pipeline_dir else []
-        self._agent_registry = AgentRegistry(user_dirs=user_agent_dirs)
-        self._pipeline_registry = PipelineRegistry(user_dirs=user_pipeline_dirs)
+        # Both registries scan the same directory — each picks up
+        # only its own files (agent: vs pipeline: top-level key)
+        user_dirs = [Path(custom_dir)] if custom_dir else []
+        self._agent_registry = AgentRegistry(user_dirs=user_dirs)
+        self._pipeline_registry = PipelineRegistry(user_dirs=user_dirs)
 
         # Cache
         self._cache_manager = CacheManager(
@@ -274,6 +274,7 @@ def convert(
     no_cache: bool = False,
     output: str | Path | None = None,
     per_page: bool = False,
+    custom_dir: str | None = None,
 ) -> ConversionResult:
     """Convert a document to markdown (sync wrapper).
 
@@ -281,8 +282,9 @@ def convert(
         output: If provided, save markdown to this path.
         per_page: If True with output, save each page as a separate file
                   in the output directory (e.g., page_001.md, page_002.md).
+        custom_dir: Directory containing custom agent and pipeline YAML files.
     """
-    converter = Doc2Md(api_key=api_key, no_cache=no_cache)
+    converter = Doc2Md(api_key=api_key, no_cache=no_cache, custom_dir=custom_dir)
     try:
         result = _run_async(
             converter.convert_async(input_path, agent=agent, pipeline=pipeline, model=model)

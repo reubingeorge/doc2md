@@ -54,7 +54,7 @@ agent:
     user: "Custom user prompt"
 """)
 
-        converter = Doc2Md(api_key="test-key", config_dir=str(tmp_path), no_cache=True)
+        converter = Doc2Md(api_key="test-key", custom_dir=str(tmp_path), no_cache=True)
 
         with patch.object(converter, "_get_vlm_client") as mock_get_client:
             mock_client = AsyncMock()

@@ -195,10 +195,17 @@ Configuration merges from multiple sources (later overrides earlier):
 
 ## Custom Agents & Pipelines
 
-Drop YAML files into `./agents/` or `./pipelines/` to extend:
+Create a directory with your custom YAML files — agents and pipelines can live side-by-side. The top-level key (`agent:` vs `pipeline:`) tells doc2md which is which:
+
+```
+custom/
+├── my_extractor.yaml      # agent: top-level key
+├── table_validator.yaml   # agent: top-level key
+└── my_pipeline.yaml       # pipeline: top-level key
+```
 
 ```yaml
-# agents/my_extractor.yaml
+# custom/my_extractor.yaml
 agent:
   name: my_extractor
   version: "1.0"
@@ -207,32 +214,36 @@ agent:
     preferred: gpt-4.1-mini
     fallback: [gpt-4o-mini]
   input: image
-  preprocessing:
-    - name: enhance_contrast
-      params: { factor: 1.5 }
   prompt:
     system: "Extract structured data from this document image."
     user: "Convert this image to well-formatted markdown."
-  postprocessing:
-    - normalize_headings
-    - strip_artifacts
 ```
 
 ```yaml
-# pipelines/my_pipeline.yaml
+# custom/my_pipeline.yaml
 pipeline:
   name: my_pipeline
   version: "1.0"
   steps:
     - name: extract
-      type: agent
       agent: my_extractor
-    - name: cleanup
-      type: code
-      function: deduplicate_content
+    - name: validate
+      agent: validator
+      input: image_and_previous
       depends_on: [extract]
-  postprocessing:
-    - fix_table_alignment
+```
+
+```python
+# Point to your custom directory
+result = doc2md.convert("doc.pdf", pipeline="my_pipeline", custom_dir="custom/")
+
+# Or with the full client
+converter = doc2md.Doc2Md(api_key="sk-...", custom_dir="custom/")
+```
+
+```bash
+# CLI
+doc2md convert doc.pdf --pipeline my_pipeline --custom-dir custom/
 ```
 
 ## Development
